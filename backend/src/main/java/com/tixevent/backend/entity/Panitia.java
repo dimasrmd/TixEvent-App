@@ -8,14 +8,19 @@ public class Panitia extends User {
         super();
     }
 
-    // Constructor Parameter Lengkap (Menyesuaikan urutan dokumen: idUser, nama, email, dll)
-    public Panitia(String idUser, String nama, String email, String password, String divisi) {
-        // Memanggil constructor parent (User) dengan tipe peran otomatis "PANITIA"
-        super(idUser, nama, email, password, "PANITIA"); 
+    // Constructor Parameter Lengkap (Menyesuaikan 5 parameter milik Zaky + 1 milikmu)
+    public Panitia(String idUser, String nama, String email, String password, String noHp, String divisi) {
+        // super() diisi TEPAT 5 parameter sesuai constructor milik Zaky
+        super(idUser, nama, email, password, noHp); 
         this.divisi = divisi;
     }
 
     // Getter dan Setter
-    public String getDivisi() { return divisi; }
-    public void setDivisi(String divisi) { this.divisi = divisi; }
+    public String getDivisi() {
+        return divisi;
+    }
+
+    public void setDivisi(String divisi) {
+        this.divisi = divisi;
+    }
 }
