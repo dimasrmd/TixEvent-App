@@ -1,4 +1,4 @@
-package com.tixevent.backend.rundown.entity;
+package com.tixevent.backend.entity;
 
 public class Event {
     // Encapsulation: atribut dibuat private dan diakses melalui getter/setter

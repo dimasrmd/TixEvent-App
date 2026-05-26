@@ -1,8 +1,8 @@
-package com.tixevent.backend.rundown.service;
+package com.tixevent.backend.service;
 
-import com.tixevent.backend.rundown.entity.Artist;
-import com.tixevent.backend.rundown.entity.Event;
-import com.tixevent.backend.rundown.entity.Rundown;
+import com.tixevent.backend.entity.Artist;
+import com.tixevent.backend.entity.Event;
+import com.tixevent.backend.entity.Rundown;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
