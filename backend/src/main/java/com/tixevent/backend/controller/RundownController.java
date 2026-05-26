@@ -1,9 +1,9 @@
-package com.tixevent.backend.rundown.controller;
+package com.tixevent.backend.controller;
 
-import com.tixevent.backend.rundown.entity.Artist;
-import com.tixevent.backend.rundown.entity.Event;
-import com.tixevent.backend.rundown.entity.Rundown;
-import com.tixevent.backend.rundown.service.RundownService;
+import com.tixevent.backend.entity.Artist;
+import com.tixevent.backend.entity.Event;
+import com.tixevent.backend.entity.Rundown;
+import com.tixevent.backend.service.RundownService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
