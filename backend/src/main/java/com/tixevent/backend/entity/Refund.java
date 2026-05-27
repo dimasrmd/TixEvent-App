@@ -1,13 +1,6 @@
 package com.tixevent.backend.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-
-@Entity
-@Table(name = "test_refund")
 public class Refund {
-    @Id
     private String idRefund;
     private String alasan;
     private double jumlahRefund;
