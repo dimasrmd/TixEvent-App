@@ -36,4 +36,26 @@ public class KeuanganService {
     public List<Refund> getDaftarRefund() {
         return daftarRefund;
     }
+
+    // Method untuk mengambil ringkasan laporan pertama (untuk dashboard Manajer)
+    public FinancialReport getLaporanTerkini() {
+        if (!daftarLaporan.isEmpty()) {
+            return daftarLaporan.get(0);
+        }
+        return new FinancialReport("LAP-EMPTY", 0.0, 0.0, 0.0);
+    }
+
+    // Method logika bisnis untuk menyetujui atau menolak refund
+    public String prosesRefund(String idRefund, String statusBaru) {
+        for (Refund r : daftarRefund) {
+            // Mencari ID Refund yang cocok
+            if (r.getIdRefund().equals(idRefund)) {
+                r.setStatusRefund(statusBaru); // Mengubah status (Misal: "APPROVED" / "REJECTED")
+
+                // Opsional: Jika APPROVED, idealnya nanti totalRefund di Laporan Keuangan bertambah
+                return "Berhasil: Status refund " + idRefund + " telah diubah menjadi " + statusBaru;
+            }
+        }
+        return "Gagal: Refund dengan ID " + idRefund + " tidak ditemukan.";
+    }
 }
