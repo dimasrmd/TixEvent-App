@@ -52,6 +52,9 @@ tenantList.add(
         )
     
 );
+boothList.add(new BoothArea("B01", "01", "Hall A", 500000, false));
+boothList.add(new BoothArea("B02", "02", "Hall B", 700000, true));
+boothList.add(new BoothArea("B03", "03", "Hall C", 600000, false));
 }
     // GET all tenants
     public List<Tenant> getAllTenants() {
