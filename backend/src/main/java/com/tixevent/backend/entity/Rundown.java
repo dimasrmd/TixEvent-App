@@ -1,4 +1,4 @@
-package com.tixevent.backend.rundown.entity;
+package com.tixevent.backend.entity;
 
 import java.time.LocalDateTime;
 
