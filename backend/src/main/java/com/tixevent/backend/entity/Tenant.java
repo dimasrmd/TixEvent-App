@@ -5,12 +5,16 @@ public class Tenant extends User {
     private String namaUsaha;
     private String jenisProduk;
 
-    public Tenant(String nama, String email, String password,
-                  String namaUsaha, String jenisProduk) {
 
+    public Tenant(String idUser, String nama, String email, 
+                  String password, String noHp,
+                  String namaUsaha, String jenisProduk) {
+        super(idUser, nama, email, password, noHp); 
         this.namaUsaha = namaUsaha;
         this.jenisProduk = jenisProduk;
     }
+
+ 
 
     public String getNamaUsaha() {
         return namaUsaha;

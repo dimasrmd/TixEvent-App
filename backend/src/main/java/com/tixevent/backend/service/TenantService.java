@@ -15,58 +15,44 @@ public class TenantService {
 
     public TenantService() {
 
-        // Initialize sample tenants
-        tenantList.add(
-                new Tenant(
-                        "PT Maju Jaya",
-                        "info@majujaya.com",
-                        "password123",
-                        "PT Maju Jaya",
-                        "Makanan & Minuman"
-                )
-        );
+      // Initialize sample tenants
+tenantList.add(
+        new Tenant(
+                "T001",                    // idUser   ← tambah
+                "PT Maju Jaya",
+                "info@majujaya.com",
+                "password123",
+                "081234567890",            // noHp     ← tambah
+                "PT Maju Jaya",
+                "Makanan & Minuman"
+        )
+);
 
-        tenantList.add(
-                new Tenant(
-                        "CV Kreatif Nusantara",
-                        "contact@kreatif.com",
-                        "password456",
-                        "CV Kreatif Nusantara",
-                        "Kerajinan Tangan"
-                )
-        );
+tenantList.add(
+        new Tenant(
+                "T002",                    // idUser   ← tambah
+                "CV Kreatif Nusantara",
+                "contact@kreatif.com",
+                "password456",
+                "081234567891",            // noHp     ← tambah
+                "CV Kreatif Nusantara",
+                "Kerajinan Tangan"
+        )
+);
 
-        tenantList.add(
-                new Tenant(
-                        "Toko Fashion Premium",
-                        "sales@fashion.com",
-                        "password789",
-                        "Toko Fashion Premium",
-                        "Fashion & Tekstil"
-                )
-        );
-
-        boothList.add(
-                new BoothArea(
-                        "B01",
-                        "01",
-                        "Hall A",
-                        500000,
-                        false
-                )
-        );
-
-        boothList.add(
-                new BoothArea(
-                        "B02",
-                        "02",
-                        "Hall B",
-                        700000,
-                        true
-                )
-        );
-    }
-
+tenantList.add(
+        new Tenant(
+                "T003",                    // idUser   ← tambah
+                "Toko Fashion Premium",
+                "sales@fashion.com",
+                "password789",
+                "081234567892",            // noHp     ← tambah
+                "Toko Fashion Premium",
+                "Fashion & Tekstil"
+        )
+    
+);
+}
     // GET all tenants
     public List<Tenant> getAllTenants() {
         return new ArrayList<>(tenantList);
