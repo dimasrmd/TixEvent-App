@@ -2,7 +2,7 @@ package com.tixevent.backend.controller;
 
 import com.tixevent.backend.entity.Artist;
 import com.tixevent.backend.entity.Event;
-import com.tixevent.backend.entity.Rundown;
+import com.tixevent.backend.entity.EventSchedule;
 import com.tixevent.backend.service.RundownService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -50,57 +50,63 @@ public class RundownController {
     }
 
     @GetMapping
-    public List<Rundown> getAllRundowns() {
-        return rundownService.getAllRundowns();
+    public List<EventSchedule> getAllSchedules() {
+        return rundownService.getAllSchedules();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getRundownById(@PathVariable Long id) {
-        return rundownService.getRundownById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @GetMapping("/{idJadwal}")
+    public ResponseEntity<?> getScheduleById(@PathVariable Long idJadwal) {
+        try {
+            EventSchedule schedule = rundownService.getScheduleById(idJadwal);
+            return ResponseEntity.ok(schedule);
+        } catch (IllegalArgumentException error) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
-    public ResponseEntity<?> addRundown(@RequestBody Rundown rundown) {
+    public ResponseEntity<?> addSchedule(@RequestBody EventSchedule eventSchedule) {
         try {
-            Rundown savedRundown = rundownService.addRundown(rundown);
-            return ResponseEntity.ok(savedRundown);
+            EventSchedule savedSchedule = rundownService.addSchedule(eventSchedule);
+            return ResponseEntity.ok(savedSchedule);
         } catch (IllegalArgumentException error) {
             return ResponseEntity.badRequest().body(error.getMessage());
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateRundown(@PathVariable Long id, @RequestBody Rundown rundown) {
+    @PutMapping("/{idJadwal}")
+    public ResponseEntity<?> updateSchedule(
+            @PathVariable Long idJadwal,
+            @RequestBody EventSchedule eventSchedule
+    ) {
         try {
-            Rundown updatedRundown = rundownService.updateRundown(id, rundown);
-            return ResponseEntity.ok(updatedRundown);
+            EventSchedule updatedSchedule = rundownService.updateSchedule(idJadwal, eventSchedule);
+            return ResponseEntity.ok(updatedSchedule);
         } catch (IllegalArgumentException error) {
             return ResponseEntity.badRequest().body(error.getMessage());
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteRundown(@PathVariable Long id) {
-        boolean deleted = rundownService.deleteRundown(id);
+    @DeleteMapping("/{idJadwal}")
+    public ResponseEntity<?> deleteSchedule(@PathVariable Long idJadwal) {
+        boolean deleted = rundownService.deleteSchedule(idJadwal);
 
         if (!deleted) {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok("Rundown berhasil dihapus");
+        return ResponseEntity.ok("Jadwal berhasil dihapus");
     }
 
     @GetMapping("/stage/{stageName}")
-    public List<Rundown> getRundownByStage(@PathVariable String stageName) {
-        return rundownService.getRundownByStage(stageName);
+    public List<EventSchedule> getSchedulesByStage(@PathVariable String stageName) {
+        return rundownService.getSchedulesByStage(stageName);
     }
 
     @PostMapping("/check-conflict")
-    public ResponseEntity<?> checkConflict(@RequestBody Rundown rundown) {
+    public ResponseEntity<?> checkConflict(@RequestBody EventSchedule eventSchedule) {
         try {
-            boolean conflict = rundownService.hasScheduleConflict(rundown);
+            boolean conflict = rundownService.hasScheduleConflict(eventSchedule);
 
             if (conflict) {
                 return ResponseEntity.ok("Jadwal bentrok pada panggung yang sama");
