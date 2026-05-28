@@ -55,7 +55,7 @@ public class RundownController {
     }
 
     @GetMapping("/{idJadwal}")
-    public ResponseEntity<?> getScheduleById(@PathVariable Long idJadwal) {
+    public ResponseEntity<?> getScheduleById(@PathVariable String idJadwal) {
         try {
             EventSchedule schedule = rundownService.getScheduleById(idJadwal);
             return ResponseEntity.ok(schedule);
@@ -76,7 +76,7 @@ public class RundownController {
 
     @PutMapping("/{idJadwal}")
     public ResponseEntity<?> updateSchedule(
-            @PathVariable Long idJadwal,
+            @PathVariable String idJadwal,
             @RequestBody EventSchedule eventSchedule
     ) {
         try {
@@ -88,7 +88,7 @@ public class RundownController {
     }
 
     @DeleteMapping("/{idJadwal}")
-    public ResponseEntity<?> deleteSchedule(@PathVariable Long idJadwal) {
+    public ResponseEntity<?> deleteSchedule(@PathVariable String idJadwal) {
         boolean deleted = rundownService.deleteSchedule(idJadwal);
 
         if (!deleted) {
@@ -98,9 +98,9 @@ public class RundownController {
         return ResponseEntity.ok("Jadwal berhasil dihapus");
     }
 
-    @GetMapping("/stage/{stageName}")
-    public List<EventSchedule> getSchedulesByStage(@PathVariable String stageName) {
-        return rundownService.getSchedulesByStage(stageName);
+    @GetMapping("/stage/{panggung}")
+    public List<EventSchedule> getSchedulesByStage(@PathVariable String panggung) {
+        return rundownService.getSchedulesByStage(panggung);
     }
 
     @PostMapping("/check-conflict")

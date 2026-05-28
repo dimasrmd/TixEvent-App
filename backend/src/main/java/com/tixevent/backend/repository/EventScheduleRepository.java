@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface EventScheduleRepository extends JpaRepository<EventSchedule, Long> {
-    List<EventSchedule> findByEventStageNameIgnoreCase(String stageName);
+public interface EventScheduleRepository extends JpaRepository<EventSchedule, String> {
+    List<EventSchedule> findByPanggungIgnoreCase(String panggung);
 }

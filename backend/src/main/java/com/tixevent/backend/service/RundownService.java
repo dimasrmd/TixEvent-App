@@ -56,7 +56,7 @@ public class RundownService {
         return eventScheduleRepository.findAll();
     }
 
-    public EventSchedule getScheduleById(Long idJadwal) {
+    public EventSchedule getScheduleById(String idJadwal) {
         return eventScheduleRepository.findById(idJadwal)
                 .orElseThrow(() -> new IllegalArgumentException("Jadwal tidak ditemukan"));
     }
@@ -68,6 +68,11 @@ public class RundownService {
                 .orElseThrow(() -> new IllegalArgumentException("Event tidak ditemukan"));
 
         eventSchedule.setEvent(event);
+
+        if (eventSchedule.getPanggung() == null || eventSchedule.getPanggung().isBlank()) {
+            eventSchedule.setPanggung(event.getStageName());
+        }
+
         validateScheduleTime(eventSchedule);
 
         if (hasScheduleConflict(eventSchedule)) {
@@ -77,7 +82,7 @@ public class RundownService {
         return eventScheduleRepository.save(eventSchedule);
     }
 
-    public EventSchedule updateSchedule(Long idJadwal, EventSchedule updatedSchedule) {
+    public EventSchedule updateSchedule(String idJadwal, EventSchedule updatedSchedule) {
         EventSchedule existingSchedule = getScheduleById(idJadwal);
 
         validateScheduleBasic(updatedSchedule);
@@ -86,12 +91,18 @@ public class RundownService {
                 .orElseThrow(() -> new IllegalArgumentException("Event tidak ditemukan"));
 
         updatedSchedule.setEvent(event);
+
+        if (updatedSchedule.getPanggung() == null || updatedSchedule.getPanggung().isBlank()) {
+            updatedSchedule.setPanggung(event.getStageName());
+        }
+
         validateScheduleTime(updatedSchedule);
 
         if (hasScheduleConflictForUpdate(idJadwal, updatedSchedule)) {
             throw new IllegalArgumentException("Jadwal bentrok pada panggung yang sama");
         }
 
+        existingSchedule.setPanggung(updatedSchedule.getPanggung());
         existingSchedule.setStartTime(updatedSchedule.getStartTime());
         existingSchedule.setEndTime(updatedSchedule.getEndTime());
         existingSchedule.setEvent(updatedSchedule.getEvent());
@@ -99,7 +110,7 @@ public class RundownService {
         return eventScheduleRepository.save(existingSchedule);
     }
 
-    public boolean deleteSchedule(Long idJadwal) {
+    public boolean deleteSchedule(String idJadwal) {
         if (!eventScheduleRepository.existsById(idJadwal)) {
             return false;
         }
@@ -108,8 +119,8 @@ public class RundownService {
         return true;
     }
 
-    public List<EventSchedule> getSchedulesByStage(String stageName) {
-        return eventScheduleRepository.findByEventStageNameIgnoreCase(stageName);
+    public List<EventSchedule> getSchedulesByStage(String panggung) {
+        return eventScheduleRepository.findByPanggungIgnoreCase(panggung);
     }
 
     public boolean hasScheduleConflict(EventSchedule newSchedule) {
@@ -120,6 +131,10 @@ public class RundownService {
                     .orElseThrow(() -> new IllegalArgumentException("Event tidak ditemukan"));
 
             newSchedule.setEvent(event);
+        }
+
+        if (newSchedule.getPanggung() == null || newSchedule.getPanggung().isBlank()) {
+            newSchedule.setPanggung(newSchedule.getEvent().getStageName());
         }
 
         validateScheduleTime(newSchedule);
@@ -135,7 +150,7 @@ public class RundownService {
         return false;
     }
 
-    private boolean hasScheduleConflictForUpdate(Long idJadwal, EventSchedule updatedSchedule) {
+    private boolean hasScheduleConflictForUpdate(String idJadwal, EventSchedule updatedSchedule) {
         List<EventSchedule> schedules = eventScheduleRepository.findAll();
 
         for (EventSchedule existingSchedule : schedules) {
@@ -152,12 +167,9 @@ public class RundownService {
     }
 
     private boolean isSameStage(EventSchedule existingSchedule, EventSchedule newSchedule) {
-        return existingSchedule.getEvent() != null
-                && newSchedule.getEvent() != null
-                && existingSchedule.getEvent().getStageName() != null
-                && newSchedule.getEvent().getStageName() != null
-                && existingSchedule.getEvent().getStageName()
-                .equalsIgnoreCase(newSchedule.getEvent().getStageName());
+        return existingSchedule.getPanggung() != null
+                && newSchedule.getPanggung() != null
+                && existingSchedule.getPanggung().equalsIgnoreCase(newSchedule.getPanggung());
     }
 
     private boolean isTimeOverlap(EventSchedule existingSchedule, EventSchedule newSchedule) {
@@ -168,6 +180,10 @@ public class RundownService {
     private void validateArtist(Artist artist) {
         if (artist == null) {
             throw new IllegalArgumentException("Artist tidak boleh kosong");
+        }
+
+        if (artist.getIdArtist() == null || artist.getIdArtist().isBlank()) {
+            throw new IllegalArgumentException("ID artist tidak boleh kosong");
         }
 
         if (artist.getName() == null || artist.getName().isBlank()) {
@@ -182,6 +198,10 @@ public class RundownService {
     private void validateEvent(Event event) {
         if (event == null) {
             throw new IllegalArgumentException("Event tidak boleh kosong");
+        }
+
+        if (event.getIdEvent() == null || event.getIdEvent().isBlank()) {
+            throw new IllegalArgumentException("ID event tidak boleh kosong");
         }
 
         if (event.getEventName() == null || event.getEventName().isBlank()) {
@@ -202,17 +222,21 @@ public class RundownService {
             throw new IllegalArgumentException("Jadwal tidak boleh kosong");
         }
 
+        if (eventSchedule.getIdJadwal() == null || eventSchedule.getIdJadwal().isBlank()) {
+            throw new IllegalArgumentException("ID jadwal tidak boleh kosong");
+        }
+
         if (eventSchedule.getEvent() == null) {
             throw new IllegalArgumentException("Event tidak boleh kosong");
         }
 
-        if (eventSchedule.getEvent().getIdEvent() == null) {
+        if (eventSchedule.getEvent().getIdEvent() == null || eventSchedule.getEvent().getIdEvent().isBlank()) {
             throw new IllegalArgumentException("ID event tidak boleh kosong");
         }
     }
 
     private void validateScheduleTime(EventSchedule eventSchedule) {
-        if (eventSchedule.getEvent().getStageName() == null || eventSchedule.getEvent().getStageName().isBlank()) {
+        if (eventSchedule.getPanggung() == null || eventSchedule.getPanggung().isBlank()) {
             throw new IllegalArgumentException("Nama panggung tidak boleh kosong");
         }
 
