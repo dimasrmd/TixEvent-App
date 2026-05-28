@@ -1,6 +1,5 @@
 package com.tixevent.backend.entity;
 
-
 import jakarta.persistence.*;
 
 @Entity
