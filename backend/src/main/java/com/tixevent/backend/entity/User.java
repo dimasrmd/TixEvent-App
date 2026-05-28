@@ -3,7 +3,7 @@ package com.tixevent.backend.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "users")
+@Table(name = "tabel_user")
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class User {
     // Atribut berdasarkan Class Diagram (Private)
