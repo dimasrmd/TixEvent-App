@@ -1,12 +1,25 @@
 package com.tixevent.backend.entity;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "tabel_booth_area")
 public class BoothArea {
 
+    @Id
     private String idBooth;
     private String nomorBooth;
     private String lokasiBooth;
     private double hargaSewa;
     private boolean statusBooth;
+
+    @OneToOne
+    @JoinColumn(name = "id_tenant_fk", unique = true)
+    private Tenant tenant;
+
+    @ManyToOne
+    @JoinColumn(name = "id_event_fk")
+    private Event event;
 
     public BoothArea() {
     }
@@ -60,5 +73,21 @@ public class BoothArea {
 
     public void setStatusBooth(boolean statusBooth) {
         this.statusBooth = statusBooth;
+    }
+
+    public Tenant getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(Tenant tenant) {
+        this.tenant = tenant;
+    }
+
+    public Event getEvent() {
+        return event;
+    }
+
+    public void setEvent(Event event) {
+        this.event = event;
     }
 }

@@ -1,5 +1,10 @@
 package com.tixevent.backend.entity;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "tabel_tenant")
 public class Tenant extends User {
 
     private String namaUsaha;

@@ -33,10 +33,10 @@ public class TenantRestController {
 
     // POST bayar sewa booth
     @PostMapping("/bayar")
-    public String rentBooth(@RequestBody Map<String, String> request) {
+    public String sewaBooth(@RequestBody Map<String, String> request) {
 
         String idBooth = request.get("idBooth");
 
-        return tenantService.rentBooth(idBooth);
+        return tenantService.sewaBooth(idBooth);
     }
 }
