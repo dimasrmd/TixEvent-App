@@ -5,9 +5,9 @@ import jakarta.persistence.Id;
 
 @Entity
 public class Event {
-    // Encapsulation: atribut dibuat private dan diakses melalui getter/setter
     @Id
-    private Long id;
+    private String idEvent;
+
     private String eventName;
     private String stageName;
     private String location;
@@ -15,39 +15,39 @@ public class Event {
     public Event() {
     }
 
-    public Event(Long id, String eventName, String stageName, String location) {
-        this.id = id;
+    public Event(String idEvent, String eventName, String stageName, String location) {
+        this.idEvent = idEvent;
         this.eventName = eventName;
         this.stageName = stageName;
         this.location = location;
     }
 
-    public Long getId() {
-        return id;
+    public String getIdEvent() {
+        return idEvent;
+    }
+
+    public void setIdEvent(String idEvent) {
+        this.idEvent = idEvent;
     }
 
     public String getEventName() {
         return eventName;
     }
 
-    public String getStageName() {
-        return stageName;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public void setEventName(String eventName) {
         this.eventName = eventName;
     }
 
+    public String getStageName() {
+        return stageName;
+    }
+
     public void setStageName(String stageName) {
         this.stageName = stageName;
+    }
+
+    public String getLocation() {
+        return location;
     }
 
     public void setLocation(String location) {
