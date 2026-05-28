@@ -1,7 +1,14 @@
 package com.tixevent.backend.entity;
 
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "tabel_user")
+@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class User {
     // Atribut berdasarkan Class Diagram (Private)
+    @Id
     private String idUser;
     private String nama;
     private String email;
