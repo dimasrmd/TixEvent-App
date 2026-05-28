@@ -1,9 +1,19 @@
 package com.tixevent.backend.entity;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "shift_logs")
 public class ShiftLog {
     // Atribut berdasarkan Class Diagram (Private)
+    @Id
     private String idShift;
-    private String idCrew; // Ditambahkan untuk menghubungkan shift dengan Crew sesuai Class Diagram
+
+    // Relasi Banyak ShiftLog ke Satu Crew (Many-to-One) sesuai Class Diagram dan ERD
+    @ManyToOne
+    @JoinColumn(name = "id_crew_fk")
+    private Crew crew; 
+
     private String tanggal;
     private String jamMulai;
     private String jamSelesai;
@@ -13,9 +23,9 @@ public class ShiftLog {
     public ShiftLog() {
     }
 
-    public ShiftLog(String idShift, String idCrew, String tanggal, String jamMulai, String jamSelesai, String posTugas, String statusHadir) {
+    public ShiftLog(String idShift, Crew crew, String tanggal, String jamMulai, String jamSelesai, String posTugas, String statusHadir) {
         this.idShift = idShift;
-        this.idCrew = idCrew;
+        this.crew = crew;
         this.tanggal = tanggal;
         this.jamMulai = jamMulai;
         this.jamSelesai = jamSelesai;
@@ -32,12 +42,12 @@ public class ShiftLog {
         this.idShift = idShift;
     }
 
-    public String getIdCrew() {
-        return idCrew;
+    public Crew getCrew() {
+        return crew;
     }
 
-    public void setIdCrew(String idCrew) {
-        this.idCrew = idCrew;
+    public void setCrew(Crew crew) {
+        this.crew = crew;
     }
 
     public String getTanggal() {

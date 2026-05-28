@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Local Environment & Helpers
+.env
+run.ps1
+

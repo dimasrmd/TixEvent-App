@@ -1,5 +1,9 @@
 package com.tixevent.backend.entity;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "crews")
 public class Crew extends User {
     // Atribut spesifik Crew berdasarkan Class Diagram (Private)
     private String posisi;
