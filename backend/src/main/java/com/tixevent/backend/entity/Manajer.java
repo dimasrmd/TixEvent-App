@@ -1,5 +1,9 @@
 package com.tixevent.backend.entity;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+@Entity
 public class Manajer extends User {
     private String jabatan;
 
