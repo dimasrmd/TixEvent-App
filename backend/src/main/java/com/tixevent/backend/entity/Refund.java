@@ -1,10 +1,21 @@
 package com.tixevent.backend.entity;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+
+@Entity
 public class Refund {
+    @Id
     private String idRefund;
     private String alasan;
     private double jumlahRefund;
     private String statusRefund; // Contoh: "PENDING", "APPROVED", "REJECTED"
+
+    @OneToOne
+    @JoinColumn(name = "id_transaksi_fk", unique = true)
+    private Transaksi transaksi;
 
     public Refund() {
     }

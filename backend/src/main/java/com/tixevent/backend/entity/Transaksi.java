@@ -1,6 +1,11 @@
 package com.tixevent.backend.entity;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+
+@Entity
 public class Transaksi {
+    @Id
     private String idTransaksi;
     private String tanggalTransaksi;
     private double totalBayar;
