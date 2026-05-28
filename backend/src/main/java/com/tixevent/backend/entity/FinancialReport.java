@@ -1,10 +1,22 @@
 package com.tixevent.backend.entity;
 
+import jakarta.persistence.*;
+
+@Entity
 public class FinancialReport {
+    @Id
     private String idLaporan;
     private double totalPemasukan;
     private double totalRefund;
     private double labaBersih;
+
+    @ManyToOne
+    @JoinColumn(name = "id_event_fk")
+    private Event event;
+
+    @ManyToOne
+    @JoinColumn(name = "id_manajer_fk")
+    private Manajer manajer;
 
     // Constructor Kosong
     public FinancialReport() {

@@ -1,61 +1,38 @@
 package com.tixevent.backend.service;
 
 import com.tixevent.backend.entity.FinancialReport;
-import com.tixevent.backend.entity.Refund;
+import com.tixevent.backend.repository.FinancialReportRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
-// Anotasi @Service menandakan bahwa kelas ini adalah Service / Logika Bisnis di Spring Boot
 @Service
 public class KeuanganService {
 
-    // In-Memory List (Wadah data sementara)
-    private List<FinancialReport> daftarLaporan = new ArrayList<>();
-    private List<Refund> daftarRefund = new ArrayList<>();
+    private final FinancialReportRepository financialReportRepository;
 
-    // Constructor: Otomatis mengisi data dummy saat aplikasi Spring Boot berjalan
-    public KeuanganService() {
-        // Dummy Data Laporan Keuangan
-        FinancialReport laporanBulanIni = new FinancialReport("LAP-001", 50000000.0, 1500000.0, 48500000.0);
-        daftarLaporan.add(laporanBulanIni);
-
-        // Dummy Data Refund
-        Refund refund1 = new Refund("REF-001", "Sakit / Tidak bisa hadir", 500000.0, "PENDING");
-        Refund refund2 = new Refund("REF-002", "Salah beli tanggal acara", 1000000.0, "APPROVED");
-        daftarRefund.add(refund1);
-        daftarRefund.add(refund2);
+    @Autowired
+    public KeuanganService(FinancialReportRepository financialReportRepository) {
+        this.financialReportRepository = financialReportRepository;
     }
 
-    // Method untuk mengambil data dummy yang nanti akan dipanggil oleh Controller di Minggu 2
+    // Mengambil rekap seluruh laporan keuangan dari Supabase
     public List<FinancialReport> getDaftarLaporan() {
-        return daftarLaporan;
+        return financialReportRepository.findAll();
     }
 
-    public List<Refund> getDaftarRefund() {
-        return daftarRefund;
-    }
-
-    // Method untuk mengambil ringkasan laporan pertama (untuk dashboard Manajer)
+    // Mengambil ringkasan laporan terkini untuk dashboard
     public FinancialReport getLaporanTerkini() {
+        List<FinancialReport> daftarLaporan = financialReportRepository.findAll();
+
         if (!daftarLaporan.isEmpty()) {
             return daftarLaporan.get(0);
         }
-        return new FinancialReport("LAP-EMPTY", 0.0, 0.0, 0.0);
-    }
 
-    // Method logika bisnis untuk menyetujui atau menolak refund
-    public String prosesRefund(String idRefund, String statusBaru) {
-        for (Refund r : daftarRefund) {
-            // Mencari ID Refund yang cocok
-            if (r.getIdRefund().equals(idRefund)) {
-                r.setStatusRefund(statusBaru); // Mengubah status (Misal: "APPROVED" / "REJECTED")
-
-                // Opsional: Jika APPROVED, idealnya nanti totalRefund di Laporan Keuangan bertambah
-                return "Berhasil: Status refund " + idRefund + " telah diubah menjadi " + statusBaru;
-            }
-        }
-        return "Gagal: Refund dengan ID " + idRefund + " tidak ditemukan.";
+        // Data default jika tabel di database masih kosong
+        FinancialReport emptyReport = new FinancialReport();
+        emptyReport.setIdLaporan("LAP-EMPTY");
+        return emptyReport;
     }
 }

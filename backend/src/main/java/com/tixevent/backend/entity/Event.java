@@ -1,16 +1,13 @@
 package com.tixevent.backend.entity;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
 public class Event {
+    // Encapsulation: atribut dibuat private dan diakses melalui getter/setter
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idEvent;
-
+    private Long id;
     private String eventName;
     private String stageName;
     private String location;

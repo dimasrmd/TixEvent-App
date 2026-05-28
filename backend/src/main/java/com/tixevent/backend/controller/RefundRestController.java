@@ -1,7 +1,7 @@
 package com.tixevent.backend.controller;
 
 import com.tixevent.backend.entity.Refund;
-import com.tixevent.backend.service.KeuanganService;
+import com.tixevent.backend.service.RefundService; // Import diubah ke RefundService
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,16 +12,18 @@ import java.util.Map;
 @CrossOrigin(origins = "http://localhost:3000")
 public class RefundRestController {
 
-    private final KeuanganService keuanganService;
+    private final RefundService refundService; // Variabel diubah menjadi RefundService
 
-    public RefundRestController(KeuanganService keuanganService) {
-        this.keuanganService = keuanganService;
+    // Dependency Injection
+    public RefundRestController(RefundService refundService) {
+        this.refundService = refundService;
     }
 
     // Endpoint GET untuk melihat semua daftar refund (untuk tabel Manajer)
     @GetMapping
     public List<Refund> getAllRefunds() {
-        return keuanganService.getDaftarRefund();
+        // Memanggil method dari RefundService
+        return refundService.getDaftarRefund();
     }
 
     // Endpoint PUT untuk mengubah status refund (Approve/Reject)
@@ -30,6 +32,7 @@ public class RefundRestController {
         // Mengambil status baru yang dikirim dari bentuk JSON {"statusRefund" : "APPROVED"}
         String statusBaru = request.get("statusRefund");
 
-        return keuanganService.prosesRefund(idRefund, statusBaru);
+        // Memanggil method dari RefundService
+        return refundService.prosesRefund(idRefund, statusBaru);
     }
 }
