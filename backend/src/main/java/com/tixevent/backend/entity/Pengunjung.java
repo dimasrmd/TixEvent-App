@@ -1,5 +1,8 @@
 package com.tixevent.backend.entity;
 
+import jakarta.persistence.Entity;
+
+@Entity
 public class Pengunjung extends User {
     private String alamat;
 

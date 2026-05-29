@@ -2,6 +2,8 @@ package com.tixevent.backend.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Transaksi {
@@ -10,6 +12,14 @@ public class Transaksi {
     private String tanggalTransaksi;
     private double totalBayar;
     private String statusPembayaran;
+
+    @ManyToOne
+    @JoinColumn(name = "id_pengunjung_fk")
+    private Pengunjung pengunjung;
+
+    @ManyToOne
+    @JoinColumn(name = "kode_tiket_fk")
+    private Tiket tiket;
 
     // Constructor Kosong
     public Transaksi() {
@@ -54,6 +64,22 @@ public class Transaksi {
 
     public void setStatusPembayaran(String statusPembayaran) {
         this.statusPembayaran = statusPembayaran;
+    }
+
+    public Pengunjung getPengunjung() {
+        return pengunjung;
+    }
+
+    public void setPengunjung(Pengunjung pengunjung) {
+        this.pengunjung = pengunjung;
+    }
+
+    public Tiket getTiket() {
+        return tiket;
+    }
+
+    public void setTiket(Tiket tiket) {
+        this.tiket = tiket;
     }
 
     // Method sesuai Class Diagram
