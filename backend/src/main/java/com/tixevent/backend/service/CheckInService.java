@@ -3,9 +3,11 @@ package com.tixevent.backend.service;
 import com.tixevent.backend.entity.Panitia;
 import com.tixevent.backend.entity.CheckInSystem;
 import com.tixevent.backend.entity.Tiket;
+import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class CheckInService {
     private final List<Panitia> panitiaList = new ArrayList<>();
     private final List<CheckInSystem> checkInList = new ArrayList<>();
