@@ -1,10 +1,21 @@
 package com.tixevent.backend.entity;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+
+@Entity
 public class Tiket {
+    @Id
     private String kodeTiket;
     private String kategori;
     private double harga;
     private boolean statusDigunakan;
+
+    @ManyToOne
+    @JoinColumn(name = "id_event_fk")
+    private Event event;
 
     // Constructor Kosong
     public Tiket() {
@@ -49,6 +60,14 @@ public class Tiket {
 
     public void setStatusDigunakan(boolean statusDigunakan) {
         this.statusDigunakan = statusDigunakan;
+    }
+
+    public Event getEvent() {
+        return event;
+    }
+
+    public void setEvent(Event event) {
+        this.event = event;
     }
 
     // Method sesuai Class Diagram
