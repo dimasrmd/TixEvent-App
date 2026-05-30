@@ -1,16 +1,20 @@
 package com.tixevent.backend.entity;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "panitia") // Menentukan nama tabel di database Supabase
 public class Panitia extends User {
     private String divisi;
 
-    // Constructor Kosong
+    // Constructor Kosong (Wajib ada untuk kebutuhan internal JPA)
     public Panitia() {
         super();
     }
 
-    // Constructor Parameter Lengkap (Menyesuaikan 5 parameter milik Zaky + 1 milikmu)
+    // Constructor Parameter Lengkap
     public Panitia(String idUser, String nama, String email, String password, String noHp, String divisi) {
-        // super() diisi TEPAT 5 parameter sesuai constructor milik Zaky
         super(idUser, nama, email, password, noHp); 
         this.divisi = divisi;
     }
