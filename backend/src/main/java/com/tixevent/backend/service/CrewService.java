@@ -8,20 +8,22 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class CrewService {
 
-    @Autowired
-    private CrewRepository crewRepository;
+    private final CrewRepository crewRepository;
+    private final ShiftLogRepository shiftLogRepository;
 
     @Autowired
-    private ShiftLogRepository shiftLogRepository;
-
-    // Konstruktor kosong
-    public CrewService() {
+    public CrewService(CrewRepository crewRepository, ShiftLogRepository shiftLogRepository) {
+        this.crewRepository = crewRepository;
+        this.shiftLogRepository = shiftLogRepository;
     }
 
     // Auto-Seeder Database: Menyuntikkan data dummy jika database Supabase kosong
@@ -70,5 +72,46 @@ public class CrewService {
             }
         }
         return false; // Gagal (Shift tidak ditemukan atau Kru tidak sesuai)
+    }
+
+    // Logika Tambah Shift Baru
+    public String tambahShift(String idCrew, String tanggal, String jamMulai, String jamSelesai, String posTugas) {
+        // Cek apakah kru terdaftar
+        Optional<Crew> crewOpt = crewRepository.findById(idCrew);
+        if (crewOpt.isEmpty()) {
+            return "Gagal: Kru dengan ID " + idCrew + " tidak ditemukan!";
+        }
+
+        ShiftLog shiftBaru = new ShiftLog();
+        String generatedId = "SHF-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+
+        shiftBaru.setIdShift(generatedId);
+        shiftBaru.setTanggal(tanggal);        // Cukup begini saja
+        shiftBaru.setJamMulai(jamMulai);      // Cukup begini saja
+        shiftBaru.setJamSelesai(jamSelesai);  // Cukup begini saja
+        shiftBaru.setPosTugas(posTugas);
+        shiftBaru.setStatusHadir("Belum Absen");
+        shiftBaru.setCrew(crewOpt.get());
+
+        shiftLogRepository.save(shiftBaru);
+        return "Berhasil: Jadwal shift baru untuk kru dibuat dengan ID " + generatedId;
+    }
+
+    // 2. Logika Ubah Shift
+    public String ubahShift(String idShift, String tanggal, String jamMulai, String jamSelesai, String posTugas) {
+        Optional<ShiftLog> shiftOpt = shiftLogRepository.findById(idShift);
+        if (shiftOpt.isEmpty()) {
+            return "Gagal: Shift dengan ID " + idShift + " tidak ditemukan!";
+        }
+
+        ShiftLog shiftDiubah = shiftOpt.get();
+        // Ubah data sesuai inputan manajer
+        shiftDiubah.setTanggal(tanggal);
+        shiftDiubah.setJamMulai(jamMulai);
+        shiftDiubah.setJamSelesai(jamSelesai);
+        shiftDiubah.setPosTugas(posTugas);
+
+        shiftLogRepository.save(shiftDiubah);
+        return "Berhasil: Jadwal shift " + idShift + " berhasil dirombak.";
     }
 }

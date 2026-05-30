@@ -13,6 +13,7 @@ public abstract class User {
     private String email;
     private String password;
     private String noHp;
+    private String role;
 
     public User() {
 
@@ -66,6 +67,10 @@ public abstract class User {
     public void setNoHp(String noHp) {
         this.noHp = noHp;
     }
+
+    public String getRole() { return role; }
+
+    public void setRole(String role) { this.role = role; }
 
     // Method berdasarkan Class Diagram (Public)
     public boolean login() {

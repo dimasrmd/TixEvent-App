@@ -17,6 +17,10 @@ public class Tiket {
     @JoinColumn(name = "id_event_fk")
     private Event event;
 
+    @ManyToOne
+    @JoinColumn(name = "id_transaksi_fk")
+    private Transaksi transaksi;
+
     // Constructor Kosong
     public Tiket() {
     }
@@ -68,6 +72,14 @@ public class Tiket {
 
     public void setEvent(Event event) {
         this.event = event;
+    }
+
+    public Transaksi getTransaksi() {
+        return transaksi;
+    }
+
+    public void setTransaksi(Transaksi transaksi) {
+        this.transaksi = transaksi;
     }
 
     // Method sesuai Class Diagram
