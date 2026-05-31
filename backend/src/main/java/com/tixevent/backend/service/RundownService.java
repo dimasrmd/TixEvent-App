@@ -102,7 +102,7 @@ public class RundownService {
     public EventSchedule updateSchedule(String idJadwal, EventSchedule updatedSchedule) {
         EventSchedule existingSchedule = getScheduleById(idJadwal);
 
-        validateScheduleBasic(updatedSchedule);
+//        validateScheduleBasic(updatedSchedule);
 
         Event event = eventRepository.findById(updatedSchedule.getEvent().getIdEvent())
                 .orElseThrow(() -> new IllegalArgumentException("Event tidak ditemukan"));

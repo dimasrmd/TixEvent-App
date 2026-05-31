@@ -97,25 +97,35 @@ public class AuthRestController {
     // HELPER METHODS (Untuk merapikan JSON Response)
     // ==========================================
     private ResponseEntity<?> formatRegisterResponse(String result) {
+        Map<String, Object> response = new java.util.HashMap<>();
         if (result.startsWith("Berhasil")) {
-            return ResponseEntity.ok(Map.of("status", "Success", "message", result));
+            response.put("status", "Success");
+            response.put("message", result);
+            return ResponseEntity.ok(response);
         }
-        return ResponseEntity.badRequest().body(Map.of("status", "Failed", "message", result));
+
+        response.put("status", "Failed");
+        response.put("message", result);
+        return ResponseEntity.badRequest().body(response);
     }
 
     private ResponseEntity<?> formatLoginResponse(User user, String roleName) {
+        Map<String, Object> response = new java.util.HashMap<>();
+
         if (user != null) {
-            return ResponseEntity.ok(Map.of(
-                    "status", "Success",
-                    "message", "Login " + roleName + " berhasil",
-                    "idUser", user.getIdUser(),
-                    "nama", user.getNama(),
-                    "role", user.getRole()
-            ));
+            response.put("status", "Success");
+            response.put("message", "Login " + roleName + " berhasil");
+
+            // Menggunakan HashMap agar kebal jika ada data bernilai null di Supabase
+            response.put("idUser", user.getIdUser());
+            response.put("nama", user.getNama());
+            response.put("role", user.getRole());
+
+            return ResponseEntity.ok(response);
         }
-        return ResponseEntity.status(401).body(Map.of(
-                "status", "Failed",
-                "message", "Login gagal! Email/Password salah atau Anda bukan " + roleName
-        ));
+
+        response.put("status", "Failed");
+        response.put("message", "Login gagal! Email/Password salah atau Anda bukan " + roleName);
+        return ResponseEntity.status(401).body(response);
     }
 }
