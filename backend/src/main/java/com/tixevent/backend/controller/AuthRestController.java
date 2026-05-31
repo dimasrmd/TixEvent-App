@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -21,63 +20,102 @@ public class AuthRestController {
         this.authService = authService;
     }
 
-    // Endpoint: POST /api/auth/register
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody Map<String, String> request) {
-        String nama = request.get("nama");
-        String email = request.get("email");
-        String password = request.get("password");
-        String noHp = request.get("noHp");
-
-        // Validasi input kosong
-        if (nama == null || email == null || password == null) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "status", "Failed",
-                    "message", "Data nama, email, dan password wajib diisi!"
-            ));
-        }
-
-        String result = authService.registerUser(nama, email, password, noHp);
-
-        if (result.startsWith("Berhasil")) {
-            return ResponseEntity.ok(Map.of(
-                    "status", "Success",
-                    "message", result
-            ));
-        } else {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "status", "Failed",
-                    "message", result
-            ));
-        }
+    // ==========================================
+    // PENGUNJUNG ENDPOINTS
+    // ==========================================
+    @PostMapping("/pengunjung/register")
+    public ResponseEntity<?> registerPengunjung(@RequestBody Map<String, String> request) {
+        String result = authService.registerPengunjung(
+                request.get("nama"), request.get("email"), request.get("password"), request.get("noHp"));
+        return formatRegisterResponse(result);
     }
 
-    // Endpoint: POST /api/auth/login
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
-        String email = request.get("email");
-        String password = request.get("password");
+    @PostMapping("/pengunjung/login")
+    public ResponseEntity<?> loginPengunjung(@RequestBody Map<String, String> request) {
+        User user = authService.loginPengunjung(request.get("email"), request.get("password"));
+        return formatLoginResponse(user, "Pengunjung");
+    }
 
-        User user = authService.loginUser(email, password);
+    // ==========================================
+    // KRU ENDPOINTS
+    // ==========================================
+    @PostMapping("/kru/register")
+    public ResponseEntity<?> registerKru(@RequestBody Map<String, String> request) {
+        String result = authService.registerKru(
+                request.get("nama"), request.get("email"), request.get("password"), request.get("noHp"));
+        return formatRegisterResponse(result);
+    }
 
+    @PostMapping("/kru/login")
+    public ResponseEntity<?> loginKru(@RequestBody Map<String, String> request) {
+        User user = authService.loginKru(request.get("email"), request.get("password"));
+        return formatLoginResponse(user, "Kru");
+    }
+
+    // ==========================================
+    // PANITIA ENDPOINTS
+    // ==========================================
+    @PostMapping("/panitia/register")
+    public ResponseEntity<?> registerPanitia(@RequestBody Map<String, String> request) {
+        String result = authService.registerPanitia(
+                request.get("nama"), request.get("email"), request.get("password"), request.get("noHp"));
+        return formatRegisterResponse(result);
+    }
+
+    @PostMapping("/panitia/login")
+    public ResponseEntity<?> loginPanitia(@RequestBody Map<String, String> request) {
+        User user = authService.loginPanitia(request.get("email"), request.get("password"));
+        return formatLoginResponse(user, "Panitia");
+    }
+
+    // ==========================================
+    // TENANT ENDPOINTS
+    // ==========================================
+    @PostMapping("/tenant/register")
+    public ResponseEntity<?> registerTenant(@RequestBody Map<String, String> request) {
+        String result = authService.registerTenant(
+                request.get("nama"), request.get("email"), request.get("password"), request.get("noHp"));
+        return formatRegisterResponse(result);
+    }
+
+    @PostMapping("/tenant/login")
+    public ResponseEntity<?> loginTenant(@RequestBody Map<String, String> request) {
+        User user = authService.loginTenant(request.get("email"), request.get("password"));
+        return formatLoginResponse(user, "Tenant");
+    }
+
+    // ==========================================
+    // MANAJER ENDPOINT (HANYA LOGIN)
+    // ==========================================
+    @PostMapping("/manajer/login")
+    public ResponseEntity<?> loginManajer(@RequestBody Map<String, String> request) {
+        User user = authService.loginManajer(request.get("email"), request.get("password"));
+        return formatLoginResponse(user, "Manajer");
+    }
+
+    // ==========================================
+    // HELPER METHODS (Untuk merapikan JSON Response)
+    // ==========================================
+    private ResponseEntity<?> formatRegisterResponse(String result) {
+        if (result.startsWith("Berhasil")) {
+            return ResponseEntity.ok(Map.of("status", "Success", "message", result));
+        }
+        return ResponseEntity.badRequest().body(Map.of("status", "Failed", "message", result));
+    }
+
+    private ResponseEntity<?> formatLoginResponse(User user, String roleName) {
         if (user != null) {
-            // Kita pisahkan data yang dikembalikan agar password TIDAK ikut terkirim ke JSON demi keamanan
-            Map<String, Object> userData = new HashMap<>();
-            userData.put("idUser", user.getIdUser());
-            userData.put("nama", user.getNama());
-            userData.put("email", user.getEmail());
-            userData.put("role", user.getRole());
-
             return ResponseEntity.ok(Map.of(
                     "status", "Success",
-                    "message", "Login berhasil!",
-                    "data", userData
-            ));
-        } else {
-            return ResponseEntity.status(401).body(Map.of(
-                    "status", "Failed",
-                    "message", "Email atau password salah!"
+                    "message", "Login " + roleName + " berhasil",
+                    "idUser", user.getIdUser(),
+                    "nama", user.getNama(),
+                    "role", user.getRole()
             ));
         }
+        return ResponseEntity.status(401).body(Map.of(
+                "status", "Failed",
+                "message", "Login gagal! Email/Password salah atau Anda bukan " + roleName
+        ));
     }
 }
