@@ -9,6 +9,7 @@ import com.tixevent.backend.repository.EventScheduleRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class RundownService {
@@ -31,6 +32,12 @@ public class RundownService {
     }
 
     public Artist addArtist(Artist artist) {
+        // 1. Generate ID otomatis menggunakan UUID
+        if (artist.getIdArtist() == null || artist.getIdArtist().isBlank()) {
+            String generatedId = "ART-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+            artist.setIdArtist(generatedId);
+        }
+
         validateArtist(artist);
 
         if (artist.getEventSchedule() != null && artist.getEventSchedule().getIdJadwal() != null) {
@@ -48,6 +55,11 @@ public class RundownService {
     }
 
     public Event addEvent(Event event) {
+        if (event.getIdEvent() == null || event.getIdEvent().isBlank()) {
+            String generatedId = "EVT-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+            event.setIdEvent(generatedId);
+        }
+
         validateEvent(event);
         return eventRepository.save(event);
     }
@@ -62,6 +74,11 @@ public class RundownService {
     }
 
     public EventSchedule addSchedule(EventSchedule eventSchedule) {
+        if (eventSchedule.getIdJadwal() == null || eventSchedule.getIdJadwal().isBlank()) {
+            String generatedId = "JDW-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+            eventSchedule.setIdJadwal(generatedId);
+        }
+
         validateScheduleBasic(eventSchedule);
 
         Event event = eventRepository.findById(eventSchedule.getEvent().getIdEvent())
