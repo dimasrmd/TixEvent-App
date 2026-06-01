@@ -1,5 +1,6 @@
 package com.tixevent.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -15,6 +16,7 @@ public class BoothArea {
 
     @OneToOne
     @JoinColumn(name = "id_tenant_fk", unique = true)
+    @JsonIgnore
     private Tenant tenant;
 
     @ManyToOne

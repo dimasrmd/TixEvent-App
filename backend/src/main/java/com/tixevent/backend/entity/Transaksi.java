@@ -13,13 +13,10 @@ public class Transaksi {
     private double totalBayar;
     private String statusPembayaran;
 
+    // Ubah tipe dari Pengunjung menjadi User agar Kru / Panitia juga bisa beli tiket jika mau
     @ManyToOne
-    @JoinColumn(name = "id_pengunjung_fk")
-    private Pengunjung pengunjung;
-
-    @ManyToOne
-    @JoinColumn(name = "kode_tiket_fk")
-    private Tiket tiket;
+    @JoinColumn(name = "id_user_fk")
+    private User user;
 
     // Constructor Kosong
     public Transaksi() {
@@ -66,20 +63,12 @@ public class Transaksi {
         this.statusPembayaran = statusPembayaran;
     }
 
-    public Pengunjung getPengunjung() {
-        return pengunjung;
+    public User getUser() {
+        return user;
     }
 
-    public void setPengunjung(Pengunjung pengunjung) {
-        this.pengunjung = pengunjung;
-    }
-
-    public Tiket getTiket() {
-        return tiket;
-    }
-
-    public void setTiket(Tiket tiket) {
-        this.tiket = tiket;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     // Method sesuai Class Diagram

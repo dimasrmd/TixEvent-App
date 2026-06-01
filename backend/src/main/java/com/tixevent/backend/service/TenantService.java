@@ -10,15 +10,21 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class TenantService {
 
-    @Autowired
-    private TenantRepository tenantRepository;
+    private final TenantRepository tenantRepository;
+    private final BoothAreaRepository boothAreaRepository;
 
+    // Menggunakan Constructor Injection agar lebih aman (Best Practice)
     @Autowired
-    private BoothAreaRepository boothAreaRepository;
+    public TenantService(TenantRepository tenantRepository, BoothAreaRepository boothAreaRepository) {
+        this.tenantRepository = tenantRepository;
+        this.boothAreaRepository = boothAreaRepository;
+    }
+
     // GET all tenants
     public List<Tenant> getAllTenants() {
         return tenantRepository.findAll();
@@ -34,7 +40,6 @@ public class TenantService {
                 availableBooth.add(booth);
             }
         }
-
         return availableBooth;
     }
 
@@ -46,14 +51,48 @@ public class TenantService {
             BoothArea booth = boothOptional.get();
 
             if (!booth.isStatusBooth()) {
+                // 1. Ubah status booth di database
                 booth.setStatusBooth(true);
                 boothAreaRepository.save(booth);
-                return "Booth berhasil disewa";
+
+                // 2. CIPTAKAN DATA TENANT BARU (Ini yang sebelumnya kurang!)
+                Tenant penyewaBaru = new Tenant();
+
+                // Karena Tenant extends User, ia butuh ID User sebagai Primary Key
+                String idTenant = "TNT-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+                penyewaBaru.setIdUser(idTenant);
+
+                // Beri data bawaan (dummy) yang masuk akal
+                penyewaBaru.setNama("Penyewa " + booth.getNomorBooth());
+                penyewaBaru.setRole("tenant");
+
+                // 👇 BUKA KOMENTAR di bawah ini jika di kelas Tenant.java kamu memiliki relasi BoothArea
+                // penyewaBaru.setBoothArea(booth);
+
+                // 3. Simpan penyewa (Tenant) ke database!
+                tenantRepository.save(penyewaBaru);
+
+                return "Berhasil: Booth disewa dengan ID Tenant " + idTenant;
             }
 
-            return "Booth sudah terisi";
+            return "Gagal: Booth sudah terisi";
         }
 
-        return "Booth tidak ditemukan";
+        return "Gagal: Booth tidak ditemukan";
+    }
+
+    // POST tambah tenant baru secara manual (Skenario Admin)
+    public Tenant tambahTenant(Tenant tenantBaru) {
+        // Jika ID belum diisi dari JSON, generate otomatis
+        if (tenantBaru.getIdUser() == null || tenantBaru.getIdUser().isEmpty()) {
+            String generatedId = "TNT-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+            tenantBaru.setIdUser(generatedId);
+        }
+
+        // Pastikan role-nya selalu tenant
+        tenantBaru.setRole("tenant");
+
+        // Simpan ke database
+        return tenantRepository.save(tenantBaru);
     }
 }

@@ -15,17 +15,17 @@ public class CheckInSystem {
 
     // Relasi ke objek Tiket (Many-to-One)
     @ManyToOne
-    @JoinColumn(name = "kode_tiket", referencedColumnName = "kodeTiket")
+    @JoinColumn(name = "kode_tiket")
     private Tiket tiket;
 
     // Relasi ke objek Transaksi (One-to-One)
     @OneToOne
-    @JoinColumn(name = "id_transaksi", referencedColumnName = "idTransaksi") // Sesuaikan idTransaksi jika milik Zaky/Jek berbeda
+    @JoinColumn(name = "id_transaksi")
     private Transaksi transaksi;
 
     // Relasi ke objek Panitia (Many-to-One)
     @ManyToOne
-    @JoinColumn(name = "id_panitia", referencedColumnName = "idUser") // idUser berasal dari inheritance kelas User
+    @JoinColumn(name = "id_panitia")
     private Panitia panitia;
 
     // Constructor Kosong (Wajib bagi JPA)

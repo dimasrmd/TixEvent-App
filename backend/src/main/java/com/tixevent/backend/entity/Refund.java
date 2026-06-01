@@ -59,4 +59,8 @@ public class Refund {
     public void setStatusRefund(String statusRefund) {
         this.statusRefund = statusRefund;
     }
+
+    public Transaksi getTransaksi() { return transaksi; }
+
+    public void setTransaksi(Transaksi transaksi) { this.transaksi = transaksi; }
 }

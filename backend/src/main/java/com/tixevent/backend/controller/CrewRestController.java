@@ -18,8 +18,12 @@ import java.util.Map;
 @RequestMapping("/api/kru")
 public class CrewRestController {
 
+    private final CrewService crewService;
+
     @Autowired
-    private CrewService crewService;
+    public CrewRestController(CrewService crewService) {
+        this.crewService = crewService;
+    }
 
     // Endpoint untuk mendapatkan seluruh data Shift (GET)
     @GetMapping("/shifts")
@@ -61,6 +65,49 @@ public class CrewRestController {
             response.put("status", "error");
             response.put("message", "Gagal. ID Shift tidak ditemukan atau Anda tidak terdaftar di shift ini.");
             return ResponseEntity.status(400).body(response);
+        }
+    }
+
+    // Endpoint POST (Manajer membuat shift baru)
+    @PostMapping("/shifts")
+    public ResponseEntity<?> tambahShiftBaru(@RequestBody Map<String, String> request) {
+        String idCrew = request.get("idCrew");
+        String tanggal = request.get("tanggal");
+        String jamMulai = request.get("jamMulai");
+        String jamSelesai = request.get("jamSelesai");
+        String posTugas = request.get("posTugas");
+
+        if (idCrew == null || tanggal == null || jamMulai == null || jamSelesai == null) {
+            return ResponseEntity.badRequest().body(Map.of("status", "Failed", "message", "Data jadwal shift tidak lengkap!"));
+        }
+
+        String result = crewService.tambahShift(idCrew, tanggal, jamMulai, jamSelesai, posTugas);
+
+        if (result.startsWith("Berhasil")) {
+            return ResponseEntity.ok(Map.of("status", "Success", "message", result));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("status", "Failed", "message", result));
+        }
+    }
+
+    // Endpoint PUT (Manajer merombak shift yang ada)
+    @PutMapping("/shifts/{idShift}")
+    public ResponseEntity<?> ubahJadwalShift(@PathVariable String idShift, @RequestBody Map<String, String> request) {
+        String tanggal = request.get("tanggal");
+        String jamMulai = request.get("jamMulai");
+        String jamSelesai = request.get("jamSelesai");
+        String posTugas = request.get("posTugas");
+
+        if (tanggal == null || jamMulai == null || jamSelesai == null) {
+            return ResponseEntity.badRequest().body(Map.of("status", "Failed", "message", "Data perombakan jadwal tidak lengkap!"));
+        }
+
+        String result = crewService.ubahShift(idShift, tanggal, jamMulai, jamSelesai, posTugas);
+
+        if (result.startsWith("Berhasil")) {
+            return ResponseEntity.ok(Map.of("status", "Success", "message", result));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("status", "Failed", "message", result));
         }
     }
 

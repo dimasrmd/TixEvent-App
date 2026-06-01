@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map; // Tambahan import untuk JSON Map
 
 @RestController
 @RequestMapping("/api/rundown")
@@ -66,11 +67,22 @@ public class RundownController {
 
     @PostMapping
     public ResponseEntity<?> addSchedule(@RequestBody EventSchedule eventSchedule) {
+        // Blokade "Satpam": Cek jika panggung null atau string kosong
+        if (eventSchedule.getPanggung() == null || eventSchedule.getPanggung().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "Failed",
+                    "message", "Data tidak lengkap: Nama panggung wajib diisi!"
+            ));
+        }
+
         try {
             EventSchedule savedSchedule = rundownService.addSchedule(eventSchedule);
             return ResponseEntity.ok(savedSchedule);
         } catch (IllegalArgumentException error) {
-            return ResponseEntity.badRequest().body(error.getMessage());
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "Failed",
+                    "message", error.getMessage()
+            ));
         }
     }
 
