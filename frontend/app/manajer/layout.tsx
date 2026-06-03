@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { getCookie, deleteCookie } from "../../lib/cookieUtils";
+import Button from "../../components/ui/Button";
 
 export default function ManagerLayout({
   children,
@@ -17,15 +19,6 @@ export default function ManagerLayout({
   useEffect(() => {
     setMounted(true);
     
-    // Simple helper to read Cookies
-    const getCookie = (name: string) => {
-      if (typeof document === "undefined") return null;
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop()?.split(";").shift();
-      return null;
-    };
-
     // Retrieve role and name
     const currentRole = getCookie("role") || localStorage.getItem("role");
     const currentNama = getCookie("nama") || localStorage.getItem("nama");
@@ -43,9 +36,9 @@ export default function ManagerLayout({
 
   const handleLogout = () => {
     // Clear cookies
-    document.cookie = "role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-    document.cookie = "idUser=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-    document.cookie = "nama=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    deleteCookie("role");
+    deleteCookie("idUser");
+    deleteCookie("nama");
     
     // Clear localStorage
     localStorage.clear();
@@ -56,41 +49,21 @@ export default function ManagerLayout({
 
   if (!mounted) {
     return (
-      <div style={{
-        minHeight: "100vh",
-        backgroundColor: "#ffffff",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontFamily: "sans-serif"
-      }}>
-        <p style={{ color: "#71717a", fontSize: "14px" }}>Memuat modul...</p>
+      <div className="min-h-screen bg-white flex items-center justify-center font-sans">
+        <p className="text-zinc-550 text-sm">Memuat modul...</p>
       </div>
     );
   }
 
   if (!authorized) {
     return (
-      <div style={{
-        minHeight: "100vh",
-        backgroundColor: "#ffffff",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        fontFamily: "sans-serif",
-        padding: "24px",
-        textAlign: "center"
-      }}>
-        <div style={{
-          fontSize: "48px",
-          marginBottom: "16px"
-        }}>🔒</div>
-        <h2 style={{ fontSize: "20px", fontWeight: "800", color: "#ef4444", margin: "0 0 8px 0" }}>Akses Terbatas</h2>
-        <p style={{ fontSize: "13px", color: "#71717a", margin: "0 0 16px 0", maxWidth: "360px" }}>
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center font-sans p-6 text-center">
+        <div className="text-5xl mb-4">🔒</div>
+        <h2 className="text-xl font-extrabold text-red-650 mb-2">Akses Terbatas</h2>
+        <p className="text-sm text-zinc-500 mb-4 max-w-[360px]">
           Halaman ini khusus untuk peran <strong>Manajer</strong>. Anda tidak memiliki otoritas atau sesi Anda telah kedaluwarsa.
         </p>
-        <p style={{ fontSize: "11px", color: "#a1a1aa" }}>Mengalihkan ke gerbang portal masuk...</p>
+        <p className="text-xs text-zinc-400">Mengalihkan ke gerbang portal masuk...</p>
       </div>
     );
   }
@@ -106,73 +79,35 @@ export default function ManagerLayout({
   ];
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      backgroundColor: "#f8fafc",
-      display: "flex",
-      fontFamily: "var(--font-outfit), sans-serif",
-      color: "#0f172a"
-    }}>
+    <div className="min-h-screen bg-zinc-50 flex font-sans text-slate-900">
       {/* Sidebar Navigation */}
-      <aside style={{
-        width: "260px",
-        backgroundColor: "#ffffff",
-        borderRight: "1px solid #e2e8f0",
-        display: "flex",
-        flexDirection: "column",
-        position: "fixed",
-        top: 0,
-        bottom: 0,
-        left: 0,
-        zIndex: 10,
-        padding: "24px 16px"
-      }}>
+      <aside className="w-[260px] bg-white border-r border-zinc-200 flex flex-col fixed top-0 bottom-0 left-0 z-10 p-6 box-border">
         {/* Brand Header */}
-        <div style={{ marginBottom: "32px", display: "flex", flexDirection: "column", gap: "4px" }}>
-          <Link href="/" style={{
-            fontSize: "20px",
-            fontWeight: "900",
-            letterSpacing: "-0.05em",
-            color: "#4f46e5",
-            textDecoration: "none",
-            display: "flex",
-            alignItems: "center",
-            gap: "8px"
-          }}>
-            TIXEVENT <span style={{ fontSize: "11px", backgroundColor: "#e0e7ff", color: "#4f46e5", padding: "2px 6px", borderRadius: "4px", fontWeight: "700" }}>SUPER</span>
+        <div className="mb-8 flex flex-col gap-1">
+          <Link href="/" className="text-lg font-black tracking-tight text-indigo-600 no-underline flex items-center gap-2">
+            TIXEVENT <span className="text-[10px] bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded font-extrabold">SUPER</span>
           </Link>
-          <span style={{ fontSize: "11px", color: "#64748b" }}>Dashboard Manajer</span>
+          <span className="text-[11px] text-zinc-400">Dashboard Manajer</span>
         </div>
 
         {/* Sidebar Profile Container */}
-        <div style={{
-          marginBottom: "24px",
-          padding: "12px",
-          backgroundColor: "#f8fafc",
-          borderRadius: "8px",
-          border: "1px solid #e2e8f0"
-        }}>
-          <p style={{ fontSize: "11px", color: "#64748b", margin: "0 0 2px 0", textTransform: "uppercase", fontWeight: "700" }}>LOGGED IN AS</p>
-          <p style={{ fontSize: "13px", fontWeight: "800", color: "#0f172a", margin: "0 0 2px 0" }}>{nama}</p>
-          <span style={{ fontSize: "10px", color: "#6366f1", fontWeight: "700" }}>👑 SUPER ADMIN</span>
+        <div className="mb-6 p-3 bg-zinc-50 rounded-lg border border-zinc-200">
+          <p className="text-[10px] text-zinc-400 m-0 mb-0.5 uppercase font-bold">LOGGED IN AS</p>
+          <p className="text-sm font-extrabold text-slate-800 m-0 mb-0.5 truncate">{nama}</p>
+          <span className="text-[10px] text-indigo-600 font-extrabold">👑 SUPER ADMIN</span>
         </div>
 
         {/* Menu Items */}
-        <nav style={{ display: "flex", flexDirection: "column", gap: "6px", flex: 1 }}>
+        <nav className="flex flex-col gap-1.5 flex-1">
           {menuItems.map((item) => {
             const isActive = pathname === item.path;
             return (
-              <Link key={item.path} href={item.path} style={{ textDecoration: "none" }}>
-                <div style={{
-                  padding: "10px 12px",
-                  borderRadius: "8px",
-                  fontSize: "13px",
-                  fontWeight: isActive ? "700" : "500",
-                  color: isActive ? "#4f46e5" : "#475569",
-                  backgroundColor: isActive ? "#eeebff" : "transparent",
-                  borderLeft: isActive ? "3px solid #4f46e5" : "3px solid transparent",
-                  transition: "all 0.2s"
-                }}>
+              <Link key={item.path} href={item.path} className="no-underline">
+                <div className={`py-2 px-3 rounded-lg text-xs font-semibold transition-all duration-150 border-l-3 ${
+                  isActive
+                    ? "text-indigo-600 bg-indigo-50 border-indigo-600 font-bold"
+                    : "text-zinc-600 hover:text-zinc-950 bg-transparent border-transparent"
+                }`}>
                   {item.name}
                 </div>
               </Link>
@@ -181,72 +116,37 @@ export default function ManagerLayout({
         </nav>
 
         {/* Footer Actions */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "auto" }}>
-          <Link href="/" style={{ textDecoration: "none" }}>
-            <div style={{
-              padding: "10px 12px",
-              borderRadius: "8px",
-              fontSize: "12px",
-              fontWeight: "600",
-              color: "#475569",
-              backgroundColor: "#f1f5f9",
-              textAlign: "center"
-            }}>
+        <div className="flex flex-col gap-2 mt-auto">
+          <Link href="/" className="no-underline">
+            <div className="py-2.5 px-3 rounded-lg text-xs font-bold text-zinc-650 bg-zinc-100 text-center hover:bg-zinc-150 transition-colors">
               🏠 Halaman Utama (Beranda)
             </div>
           </Link>
-          <button
+          <Button
             onClick={handleLogout}
-            style={{
-              padding: "10px 12px",
-              borderRadius: "8px",
-              fontSize: "12px",
-              fontWeight: "700",
-              color: "#ef4444",
-              backgroundColor: "#fef2f2",
-              border: "1px solid #fee2e2",
-              cursor: "pointer",
-              textAlign: "center"
-            }}
+            variant="danger"
+            className="py-2.5 px-3 rounded-lg text-xs font-bold text-center"
+            fullWidth
           >
             ❌ Log Out (Keluar)
-          </button>
+          </Button>
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <main style={{
-        marginLeft: "260px",
-        flex: 1,
-        minWidth: 0,
-        boxSizing: "border-box"
-      }}>
+      <main className="ml-[260px] flex-1 min-w-0 box-border">
         {/* Top Header Bar */}
-        <header style={{
-          height: "64px",
-          backgroundColor: "#ffffff",
-          borderBottom: "1px solid #e2e8f0",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "0 32px",
-          position: "sticky",
-          top: 0,
-          zIndex: 5
-        }}>
-          <div style={{ fontSize: "14px", fontWeight: "600", color: "#64748b" }}>
-            Status Server: <span style={{ color: "#22c55e", fontWeight: "700" }}>● MOCK FRONTEND ONLINE</span>
+        <header className="h-16 bg-white border-b border-zinc-200 flex items-center justify-between px-8 sticky top-0 z-5">
+          <div className="text-xs font-semibold text-zinc-400">
+            Status Server: <span className="text-emerald-500 font-bold">● MOCK FRONTEND ONLINE</span>
           </div>
-          <div style={{ fontSize: "12px", color: "#64748b" }}>
+          <div className="text-[11px] text-zinc-400">
             TixEvent Enterprise Edition v2.0
           </div>
         </header>
 
         {/* Dynamic Inner Viewport */}
-        <div style={{
-          padding: "32px",
-          boxSizing: "border-box"
-        }}>
+        <div className="p-8 box-border">
           {children}
         </div>
       </main>

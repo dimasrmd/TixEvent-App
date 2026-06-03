@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Card from "../../components/ui/Card";
 
 interface ScheduleItem {
   id: string;
@@ -44,73 +45,41 @@ export default function ScheduleLineup() {
   ];
 
   return (
-    <main style={{
-      minHeight: "100vh",
-      backgroundColor: "#ffffff",
-      color: "#09090b",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: "24px",
-      fontFamily: "sans-serif",
-      boxSizing: "border-box"
-    }}>
-      <div style={{
-        width: "100%",
-        maxWidth: "500px",
-        padding: "32px",
-        border: "1px solid #e4e4e7",
-        borderRadius: "16px",
-        boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-        boxSizing: "border-box",
-        backgroundColor: "#ffffff"
-      }}>
-        <div style={{ textAlign: "center", marginBottom: "24px" }}>
-          <h2 style={{ fontSize: "22px", fontWeight: "800", color: "#18181b", margin: "0 0 4px 0", letterSpacing: "-0.02em" }}>Jadwal Acara & Lineup</h2>
-          <p style={{ fontSize: "12px", color: "#71717a", margin: 0 }}>Daftar penampil resmi dan rundown jam tampil di panggung</p>
+    <main className="min-h-screen bg-white text-zinc-900 flex flex-col items-center justify-center p-6 font-sans box-border">
+      <Card maxWidth="500px">
+        <div className="text-center mb-6">
+          <h2 className="text-xl font-bold text-zinc-850 m-0 mb-1">Jadwal Acara & Lineup</h2>
+          <p className="text-xs text-zinc-500 m-0">Daftar penampil resmi dan rundown jam tampil di panggung</p>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "24px" }}>
+        <div className="flex flex-col gap-4 mb-6">
           {schedules.map((item) => (
-            <div key={item.id} style={{
-              padding: "16px",
-              border: "1px solid #e4e4e7",
-              borderRadius: "12px",
-              backgroundColor: "#fafafa"
-            }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px" }}>
-                <h3 style={{ fontSize: "16px", fontWeight: "700", color: "#18181b", margin: 0 }}>{item.artist}</h3>
-                <span style={{
-                  fontSize: "10px",
-                  fontWeight: "700",
-                  backgroundColor: "#e0e7ff",
-                  color: "#4338ca",
-                  padding: "4px 8px",
-                  borderRadius: "6px"
-                }}>
+            <div key={item.id} className="p-4 border border-zinc-200 rounded-xl bg-zinc-50">
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="text-sm font-bold text-zinc-900 m-0">{item.artist}</h3>
+                <span className="text-[10px] font-bold bg-indigo-50 text-indigo-600 padding-xs rounded-md px-1.5 py-0.5 border border-indigo-100">
                   {item.id}
                 </span>
               </div>
-              <p style={{ fontSize: "13px", color: "#4f46e5", fontWeight: "600", margin: "0 0 4px 0" }}>
+              <p className="text-xs text-indigo-600 font-semibold m-0 mb-1">
                 📍 {item.panggung}
               </p>
-              <p style={{ fontSize: "12px", color: "#059669", fontWeight: "700", margin: "0 0 6px 0" }}>
+              <p className="text-xs text-emerald-600 font-bold m-0 mb-1.5">
                 🕒 {item.waktu}
               </p>
-              <p style={{ fontSize: "12px", color: "#71717a", margin: 0, fontStyle: "italic" }}>
+              <p className="text-xs text-zinc-500 m-0 italic">
                 {item.keterangan}
               </p>
             </div>
           ))}
         </div>
 
-        <div style={{ textAlign: "center" }}>
-          <Link href="/" style={{ color: "#71717a", fontWeight: "600", textDecoration: "none", fontSize: "12px" }}>
+        <div className="text-center">
+          <Link href="/" className="text-zinc-500 font-semibold no-underline hover:underline text-xs">
             Kembali ke Beranda
           </Link>
         </div>
-      </div>
+      </Card>
     </main>
   );
 }

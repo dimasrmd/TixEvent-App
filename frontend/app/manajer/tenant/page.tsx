@@ -1,17 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
-interface TenantPartner {
-  idTenant: string;
-  namaBrand: string;
-  email: string;
-  noHp: string;
-  nomorBooth: string;
-  lokasiBooth: string;
-  kategoriUsaha: string;
-  statusSewa: "TERVERIFIKASI" | "MENUNGGU_BAYAR";
-}
+import { TenantPartner } from "../../../lib/types";
 
 export default function TenantManagement() {
   const [tenants, setTenants] = useState<TenantPartner[]>([]);
@@ -61,69 +51,48 @@ export default function TenantManagement() {
   return (
     <div>
       {/* Title Header */}
-      <div style={{ marginBottom: "24px" }}>
-        <h1 style={{ fontSize: "24px", fontWeight: "800", color: "#0f172a", margin: "0 0 4px 0" }}>Daftar Mitra Tenant & Stan</h1>
-        <p style={{ fontSize: "13px", color: "#64748b", margin: 0 }}>Tinjau seluruh data tenant komersial yang telah menyewa lokasi booth stan dan terverifikasi di area event</p>
+      <div className="mb-6">
+        <h1 className="text-2xl font-black text-slate-800 m-0 mb-1">Daftar Mitra Tenant & Stan</h1>
+        <p className="text-xs text-slate-500 m-0">Tinjau seluruh data tenant komersial yang telah menyewa lokasi booth stan dan terverifikasi di area event</p>
       </div>
 
       {/* Tenant Table Container */}
-      <div style={{
-        backgroundColor: "#ffffff",
-        border: "1px solid #e2e8f0",
-        borderRadius: "12px",
-        padding: "24px",
-        boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.05)"
-      }}>
-        <h2 style={{ fontSize: "16px", fontWeight: "700", color: "#0f172a", margin: "0 0 16px 0" }}>Rekap Penyewaan Mitra</h2>
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
+      <div className="bg-white border border-zinc-200 rounded-2xl p-6 shadow-sm box-border">
+        <h2 className="text-sm font-bold text-slate-800 m-0 mb-4">Rekap Penyewaan Mitra</h2>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-left text-xs">
             <thead>
-              <tr style={{ borderBottom: "2px solid #f1f5f9" }}>
-                <th style={{ padding: "12px 10px", color: "#64748b", fontWeight: "700" }}>ID MITRA</th>
-                <th style={{ padding: "12px 10px", color: "#64748b", fontWeight: "700" }}>NAMA BRAND / USAHA</th>
-                <th style={{ padding: "12px 10px", color: "#64748b", fontWeight: "700" }}>KATEGORI</th>
-                <th style={{ padding: "12px 10px", color: "#64748b", fontWeight: "700" }}>BOOTH TERSEWA</th>
-                <th style={{ padding: "12px 10px", color: "#64748b", fontWeight: "700" }}>KONTAK MITRA</th>
-                <th style={{ padding: "12px 10px", color: "#64748b", fontWeight: "700" }}>STATUS SEWA</th>
+              <tr className="border-b-2 border-zinc-100">
+                <th className="py-3 px-2.5 text-zinc-400 font-bold">ID MITRA</th>
+                <th className="py-3 px-2.5 text-zinc-400 font-bold">NAMA BRAND / USAHA</th>
+                <th className="py-3 px-2.5 text-zinc-400 font-bold">KATEGORI</th>
+                <th className="py-3 px-2.5 text-zinc-400 font-bold">BOOTH TERSEWA</th>
+                <th className="py-3 px-2.5 text-zinc-400 font-bold">KONTAK MITRA</th>
+                <th className="py-3 px-2.5 text-zinc-400 font-bold">STATUS SEWA</th>
               </tr>
             </thead>
             <tbody>
               {tenants.map((partner) => (
-                <tr key={partner.idTenant} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                  <td style={{ padding: "16px 10px", fontWeight: "700", color: "#64748b" }}>{partner.idTenant}</td>
-                  <td style={{ padding: "16px 10px" }}>
-                    <div style={{ fontWeight: "700", color: "#0f172a" }}>{partner.namaBrand}</div>
+                <tr key={partner.idTenant} className="border-b border-zinc-100 hover:bg-zinc-50/50">
+                  <td className="py-4 px-2.5 font-bold text-zinc-400">{partner.idTenant}</td>
+                  <td className="py-4 px-2.5">
+                    <div className="font-bold text-slate-800">{partner.namaBrand}</div>
                   </td>
-                  <td style={{ padding: "16px 10px" }}>
-                    <span style={{
-                      fontSize: "11px",
-                      fontWeight: "600",
-                      padding: "2px 8px",
-                      borderRadius: "6px",
-                      backgroundColor: "#f1f5f9",
-                      color: "#475569"
-                    }}>
+                  <td className="py-4 px-2.5">
+                    <span className="text-[10px] font-semibold py-1 px-2.5 rounded bg-zinc-100 text-zinc-700">
                       {partner.kategoriUsaha}
                     </span>
                   </td>
-                  <td style={{ padding: "16px 10px" }}>
-                    <div style={{ fontWeight: "700", color: "#059669" }}>⛺ Booth {partner.nomorBooth}</div>
-                    <div style={{ fontSize: "11px", color: "#64748b" }}>📍 {partner.lokasiBooth}</div>
+                  <td className="py-4 px-2.5">
+                    <div className="font-bold text-emerald-600">⛺ Booth {partner.nomorBooth}</div>
+                    <div className="text-[10px] text-zinc-400 mt-0.5">📍 {partner.lokasiBooth}</div>
                   </td>
-                  <td style={{ padding: "16px 10px" }}>
-                    <div style={{ color: "#0f172a" }}>{partner.email}</div>
-                    <div style={{ fontSize: "11px", color: "#64748b" }}>📱 {partner.noHp}</div>
+                  <td className="py-4 px-2.5">
+                    <div className="text-slate-800 font-medium">{partner.email}</div>
+                    <div className="text-[10px] text-zinc-400 mt-0.5">📱 {partner.noHp}</div>
                   </td>
-                  <td style={{ padding: "16px 10px" }}>
-                    <span style={{
-                      fontSize: "10px",
-                      fontWeight: "700",
-                      padding: "3px 8px",
-                      borderRadius: "4px",
-                      backgroundColor: "#f0fdf4",
-                      color: "#16a34a",
-                      border: "1px solid #bbf7d0"
-                    }}>
+                  <td className="py-4 px-2.5">
+                    <span className="text-[9px] font-bold py-1 px-2 rounded bg-emerald-50 text-emerald-600 border border-emerald-100">
                       ✓ {partner.statusSewa}
                     </span>
                   </td>

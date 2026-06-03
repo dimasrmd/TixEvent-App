@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Card from "../../../components/ui/Card";
+import Button from "../../../components/ui/Button";
 
 interface BoothSpot {
   idBooth: string;
@@ -65,137 +67,73 @@ export default function TenantBoothSelection() {
   };
 
   return (
-    <main style={{
-      minHeight: "100vh",
-      backgroundColor: "#ffffff",
-      color: "#09090b",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: "24px",
-      fontFamily: "sans-serif",
-      boxSizing: "border-box"
-    }}>
-      <div style={{
-        width: "100%",
-        maxWidth: "500px",
-        padding: "32px",
-        border: "1px solid #e4e4e7",
-        borderRadius: "16px",
-        boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-        boxSizing: "border-box",
-        backgroundColor: "#ffffff"
-      }}>
-        <div style={{ textAlign: "center", marginBottom: "24px" }}>
-          <h2 style={{ fontSize: "20px", fontWeight: "700", color: "#18181b", margin: "0 0 4px 0" }}>Pilih & Sewa Booth Stan</h2>
-          <p style={{ fontSize: "12px", color: "#71717a", margin: 0 }}>Gunakan antarmuka di bawah ini untuk memilih lokasi booth stan Anda yang kosong</p>
+    <main className="min-h-screen bg-white text-zinc-900 flex flex-col items-center justify-center p-6 font-sans box-border">
+      <Card maxWidth="500px">
+        <div className="text-center mb-6">
+          <h2 className="text-xl font-bold text-zinc-850 m-0 mb-1">Pilih & Sewa Booth Stan</h2>
+          <p className="text-xs text-zinc-500 m-0">Gunakan antarmuka di bawah ini untuk memilih lokasi booth stan Anda yang kosong</p>
         </div>
 
         {error && (
-          <div style={{
-            marginBottom: "16px",
-            padding: "12px",
-            borderRadius: "8px",
-            backgroundColor: "#fef2f2",
-            border: "1px solid #fecaca",
-            color: "#dc2626",
-            fontSize: "12px",
-            fontWeight: "600"
-          }}>
+          <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-xs font-semibold">
             {error}
           </div>
         )}
 
         {success && (
-          <div style={{
-            marginBottom: "16px",
-            padding: "12px",
-            borderRadius: "8px",
-            backgroundColor: "#ecfdf5",
-            border: "1px solid #a7f3d0",
-            color: "#059669",
-            fontSize: "12px",
-            fontWeight: "600",
-            lineHeight: "1.4"
-          }}>
+          <div className="mb-4 p-3 rounded-lg bg-emerald-50 border border-emerald-250 text-emerald-600 text-xs font-semibold leading-relaxed">
             {success}
           </div>
         )}
 
         {booths.length > 0 ? (
-          <form onSubmit={handleRent} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          <form onSubmit={handleRent} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
               {booths.map((spot) => (
-                <label key={spot.idBooth} style={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: "12px",
-                  padding: "16px",
-                  border: selectedBoothId === spot.idBooth ? "2px solid #059669" : "1px solid #e4e4e7",
-                  borderRadius: "12px",
-                  backgroundColor: selectedBoothId === spot.idBooth ? "#ecfdf5" : "#fafafa",
-                  cursor: "pointer",
-                  transition: "all 0.2s"
-                }}>
+                <label
+                  key={spot.idBooth}
+                  className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-all duration-200 ${
+                    selectedBoothId === spot.idBooth
+                      ? "border-emerald-600 bg-emerald-50/50"
+                      : "border-zinc-250 bg-zinc-50 hover:bg-zinc-100/55"
+                  }`}
+                >
                   <input
                     type="radio"
                     name="boothSelection"
                     value={spot.idBooth}
                     checked={selectedBoothId === spot.idBooth}
                     onChange={(e) => setSelectedBoothId(e.target.value)}
-                    style={{ marginTop: "3px", accentColor: "#059669" }}
+                    className="mt-1 accent-emerald-600"
                   />
-                  <div>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", width: "100%", minWidth: "220px" }}>
-                      <span style={{ fontSize: "15px", fontWeight: "700", color: "#18181b" }}>Booth {spot.nomorBooth}</span>
-                      <span style={{ fontSize: "14px", fontWeight: "800", color: "#059669" }}>{spot.hargaSewa}</span>
+                  <div className="flex-1">
+                    <div className="flex justify-between items-baseline w-full">
+                      <span className="text-sm font-bold text-zinc-900">Booth {spot.nomorBooth}</span>
+                      <span className="text-sm font-extrabold text-emerald-600">{spot.hargaSewa}</span>
                     </div>
-                    <p style={{ fontSize: "12px", color: "#71717a", margin: "4px 0" }}>📍 {spot.lokasiBooth}</p>
-                    <p style={{ fontSize: "11px", color: "#a1a1aa", margin: 0, fontStyle: "italic" }}>{spot.keterangan}</p>
+                    <p className="text-xs text-zinc-500 m-0 my-1">📍 {spot.lokasiBooth}</p>
+                    <p className="text-[11px] text-zinc-400 m-0 italic">{spot.keterangan}</p>
                   </div>
                 </label>
               ))}
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                width: "100%",
-                backgroundColor: "#059669",
-                color: "#ffffff",
-                border: "none",
-                fontWeight: "600",
-                padding: "12px",
-                borderRadius: "8px",
-                cursor: "pointer",
-                fontSize: "14px",
-                marginTop: "8px",
-                opacity: loading ? 0.7 : 1
-              }}
-            >
-              {loading ? "Memproses Sewa..." : "Sewa Booth Terpilih"}
-            </button>
+            <Button type="submit" variant="secondary" loading={loading} className="mt-2">
+              Sewa Booth Terpilih
+            </Button>
           </form>
         ) : (
-          <div style={{
-            padding: "24px",
-            textAlign: "center",
-            border: "1px solid #e4e4e7",
-            borderRadius: "12px",
-            backgroundColor: "#fafafa"
-          }}>
-            <p style={{ fontSize: "14px", color: "#71717a", margin: 0 }}>Semua booth area telah disewa oleh Mitra lainnya.</p>
+          <div className="p-6 text-center border border-zinc-200 rounded-xl bg-zinc-50">
+            <p className="text-sm text-zinc-500 m-0">Semua booth area telah disewa oleh Mitra lainnya.</p>
           </div>
         )}
 
-        <div style={{ marginTop: "24px", textAlign: "center" }}>
-          <Link href="/" style={{ color: "#71717a", fontWeight: "600", textDecoration: "none", fontSize: "12px" }}>
+        <div className="mt-6 text-center">
+          <Link href="/" className="text-zinc-500 font-semibold no-underline hover:underline text-xs">
             Kembali ke Beranda
           </Link>
         </div>
-      </div>
+      </Card>
     </main>
   );
 }

@@ -1,30 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
-interface EventItem {
-  idEvent: string;
-  eventName: string;
-  stageName: string;
-  location: string;
-}
-
-interface ArtistItem {
-  idArtist: string;
-  name: string;
-  genre: string;
-}
-
-interface EventSchedule {
-  idJadwal: string;
-  panggung: string;
-  startTime: string; // ISO date string
-  endTime: string;   // ISO date string
-  eventId: string;
-  eventName: string;
-  artistId: string;
-  artistName: string;
-}
+import { EventItem, ArtistItem, EventSchedule } from "../../../lib/types";
+import Card from "../../../components/ui/Card";
+import Button from "../../../components/ui/Button";
+import Input from "../../../components/ui/Input";
+import Select from "../../../components/ui/Select";
 
 export default function RundownScheduling() {
   const [events, setEvents] = useState<EventItem[]>([]);
@@ -241,260 +222,110 @@ export default function RundownScheduling() {
   return (
     <div>
       {/* Title Header */}
-      <div style={{ marginBottom: "24px" }}>
-        <h1 style={{ fontSize: "24px", fontWeight: "800", color: "#0f172a", margin: "0 0 4px 0" }}>Penjadwalan Rundown Konser</h1>
-        <p style={{ fontSize: "13px", color: "#64748b", margin: 0 }}>Kelola data event, registrasi musisi, serta susun timeline rundown dengan proteksi pendeteksi jadwal bentrok</p>
+      <div className="mb-6">
+        <h1 className="text-2xl font-black text-slate-800 m-0 mb-1">Penjadwalan Rundown Konser</h1>
+        <p className="text-xs text-slate-500 m-0">Kelola data event, registrasi musisi, serta susun timeline rundown dengan proteksi pendeteksi jadwal bentrok</p>
       </div>
 
       {success && (
-        <div style={{
-          marginBottom: "20px",
-          padding: "12px 16px",
-          borderRadius: "8px",
-          backgroundColor: "#ecfdf5",
-          border: "1px solid #a7f3d0",
-          color: "#059669",
-          fontSize: "13px",
-          fontWeight: "600"
-        }}>
+        <div className="mb-5 py-3 px-4 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-600 text-xs font-semibold">
           ✅ {success}
         </div>
       )}
 
       {error && (
-        <div style={{
-          marginBottom: "20px",
-          padding: "12px 16px",
-          borderRadius: "8px",
-          backgroundColor: "#fef2f2",
-          border: "1px solid #fecaca",
-          color: "#dc2626",
-          fontSize: "13px",
-          fontWeight: "600"
-        }}>
+        <div className="mb-5 py-3 px-4 rounded-lg bg-red-50 border border-red-200 text-red-650 text-xs font-semibold">
           ⚠️ {error}
         </div>
       )}
 
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1.6fr",
-        gap: "24px",
-        alignItems: "start"
-      }}>
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_1.6fr] gap-6 items-start">
         {/* Left Side: Adding Events, Artists, and Schedules */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+        <div className="flex flex-col gap-6">
           
           {/* Form 1: Add Schedule (Primary) */}
-          <div style={{
-            backgroundColor: "#ffffff",
-            border: "1px solid #e2e8f0",
-            borderRadius: "12px",
-            padding: "24px",
-            boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.05)"
-          }}>
-            <h2 style={{ fontSize: "16px", fontWeight: "700", color: "#0f172a", margin: "0 0 16px 0" }}>📅 Tambah Jadwal Rundown</h2>
-            <form onSubmit={handleAddSchedule} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              
-              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                <label style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.05em", color: "#64748b" }}>
-                  Pilih Event
-                </label>
-                <select
-                  value={selectedEventId}
-                  onChange={(e) => setSelectedEventId(e.target.value)}
-                  style={{
-                    width: "100%",
-                    boxSizing: "border-box",
-                    backgroundColor: "#f8fafc",
-                    border: "1px solid #e2e8f0",
-                    borderRadius: "8px",
-                    padding: "8px 12px",
-                    fontSize: "13px",
-                    color: "#0f172a",
-                    outline: "none",
-                    fontWeight: "600"
-                  }}
-                >
-                  {events.map((evt) => (
-                    <option key={evt.idEvent} value={evt.idEvent}>
-                      {evt.eventName}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                <label style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.05em", color: "#64748b" }}>
-                  Pilih Artis Musisi
-                </label>
-                <select
-                  value={selectedArtistId}
-                  onChange={(e) => setSelectedArtistId(e.target.value)}
-                  style={{
-                    width: "100%",
-                    boxSizing: "border-box",
-                    backgroundColor: "#f8fafc",
-                    border: "1px solid #e2e8f0",
-                    borderRadius: "8px",
-                    padding: "8px 12px",
-                    fontSize: "13px",
-                    color: "#0f172a",
-                    outline: "none",
-                    fontWeight: "600"
-                  }}
-                >
-                  {artists.map((art) => (
-                    <option key={art.idArtist} value={art.idArtist}>
-                      {art.name} ({art.genre})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                <label style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.05em", color: "#64748b" }}>
-                  Nama Panggung
-                </label>
-                <select
-                  value={schedulePanggung}
-                  onChange={(e) => setSchedulePanggung(e.target.value)}
-                  style={{
-                    width: "100%",
-                    boxSizing: "border-box",
-                    backgroundColor: "#f8fafc",
-                    border: "1px solid #e2e8f0",
-                    borderRadius: "8px",
-                    padding: "8px 12px",
-                    fontSize: "13px",
-                    color: "#0f172a",
-                    outline: "none",
-                    fontWeight: "600",
-                    cursor: "pointer"
-                  }}
-                >
-                  <option value="Main Stage">Main Stage (Panggung Utama)</option>
-                  <option value="Cyber Stage">Cyber Stage (Panggung Elektronik)</option>
-                  <option value="Neon Stage">Neon Stage (Panggung Baru)</option>
-                </select>
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                  <label style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.05em", color: "#64748b" }}>
-                    Waktu Mulai
-                  </label>
-                  <input
-                    type="datetime-local"
-                    value={scheduleStart}
-                    onChange={(e) => setScheduleStart(e.target.value)}
-                    style={{
-                      width: "100%",
-                      boxSizing: "border-box",
-                      backgroundColor: "#f8fafc",
-                      border: "1px solid #e2e8f0",
-                      borderRadius: "8px",
-                      padding: "8px 12px",
-                      fontSize: "13px",
-                      color: "#0f172a",
-                      outline: "none"
-                    }}
-                    required
-                  />
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                  <label style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.05em", color: "#64748b" }}>
-                    Waktu Selesai
-                  </label>
-                  <input
-                    type="datetime-local"
-                    value={scheduleEnd}
-                    onChange={(e) => setScheduleEnd(e.target.value)}
-                    style={{
-                      width: "100%",
-                      boxSizing: "border-box",
-                      backgroundColor: "#f8fafc",
-                      border: "1px solid #e2e8f0",
-                      borderRadius: "8px",
-                      padding: "8px 12px",
-                      fontSize: "13px",
-                      color: "#0f172a",
-                      outline: "none"
-                    }}
-                    required
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading || events.length === 0 || artists.length === 0}
-                style={{
-                  width: "100%",
-                  backgroundColor: "#4f46e5",
-                  color: "#ffffff",
-                  border: "none",
-                  fontWeight: "700",
-                  padding: "10px",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  fontSize: "13px",
-                  marginTop: "6px",
-                  opacity: loading ? 0.7 : 1,
-                  boxShadow: "0 2px 4px 0 rgba(79, 70, 229, 0.15)"
-                }}
+          <Card maxWidth="100%">
+            <h2 className="text-sm font-bold text-slate-800 m-0 mb-4">📅 Tambah Jadwal Rundown</h2>
+            <form onSubmit={handleAddSchedule} className="flex flex-col gap-3.5">
+              <Select
+                id="selectedEventId"
+                label="Pilih Event"
+                value={selectedEventId}
+                onChange={(e) => setSelectedEventId(e.target.value)}
               >
-                {loading ? "Memproses..." : "➕ Simpan ke Rundown"}
-              </button>
+                {events.map((evt) => (
+                  <option key={evt.idEvent} value={evt.idEvent}>
+                    {evt.eventName}
+                  </option>
+                ))}
+              </Select>
+
+              <Select
+                id="selectedArtistId"
+                label="Pilih Artis Musisi"
+                value={selectedArtistId}
+                onChange={(e) => setSelectedArtistId(e.target.value)}
+              >
+                {artists.map((art) => (
+                  <option key={art.idArtist} value={art.idArtist}>
+                    {art.name} ({art.genre})
+                  </option>
+                ))}
+              </Select>
+
+              <Select
+                id="schedulePanggung"
+                label="Nama Panggung"
+                value={schedulePanggung}
+                onChange={(e) => setSchedulePanggung(e.target.value)}
+              >
+                <option value="Main Stage">Main Stage (Panggung Utama)</option>
+                <option value="Cyber Stage">Cyber Stage (Panggung Elektronik)</option>
+                <option value="Neon Stage">Neon Stage (Panggung Baru)</option>
+              </Select>
+
+              <div className="grid grid-cols-2 gap-3">
+                <Input
+                  id="scheduleStart"
+                  type="datetime-local"
+                  label="Waktu Mulai"
+                  value={scheduleStart}
+                  onChange={(e) => setScheduleStart(e.target.value)}
+                  required
+                />
+                <Input
+                  id="scheduleEnd"
+                  type="datetime-local"
+                  label="Waktu Selesai"
+                  value={scheduleEnd}
+                  onChange={(e) => setScheduleEnd(e.target.value)}
+                  required
+                />
+              </div>
+
+              <Button type="submit" loading={loading} disabled={events.length === 0 || artists.length === 0} className="mt-1 shadow-indigo-50">
+                ➕ Simpan ke Rundown
+              </Button>
             </form>
-          </div>
+          </Card>
 
           {/* Form 2: Add New Event & Form 3: Add New Artist */}
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "1fr",
-            gap: "16px"
-          }}>
+          <div className="grid grid-cols-1 gap-4">
             {/* Event Form */}
-            <div style={{
-              backgroundColor: "#ffffff",
-              border: "1px solid #e2e8f0",
-              borderRadius: "12px",
-              padding: "20px",
-              boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.05)"
-            }}>
-              <h3 style={{ fontSize: "14px", fontWeight: "700", color: "#0f172a", margin: "0 0 12px 0" }}>🎤 Tambah Master Event</h3>
-              <form onSubmit={handleAddEvent} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            <div className="bg-white border border-zinc-200 rounded-2xl p-5 shadow-sm box-border">
+              <h3 className="text-xs font-bold text-slate-800 m-0 mb-3">🎤 Tambah Master Event</h3>
+              <form onSubmit={handleAddEvent} className="flex flex-col gap-2.5">
                 <input
                   type="text"
                   placeholder="Nama Event Konser"
                   value={newEventName}
                   onChange={(e) => setNewEventName(e.target.value)}
-                  style={{
-                    width: "100%",
-                    boxSizing: "border-box",
-                    backgroundColor: "#f8fafc",
-                    border: "1px solid #e2e8f0",
-                    borderRadius: "8px",
-                    padding: "8px 12px",
-                    fontSize: "12px",
-                    color: "#0f172a",
-                    outline: "none"
-                  }}
+                  className="w-full bg-zinc-50 border border-zinc-200 rounded-lg py-2 px-3 text-xs text-zinc-900 placeholder-zinc-400 outline-none focus:border-indigo-500 transition-colors box-border"
                   required
                 />
                 <button
                   type="submit"
-                  style={{
-                    backgroundColor: "#0f172a",
-                    color: "#ffffff",
-                    border: "none",
-                    fontWeight: "700",
-                    padding: "8px",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                    fontSize: "11px"
-                  }}
+                  className="w-full bg-slate-800 hover:bg-slate-900 text-white border-none font-bold py-2 rounded-lg cursor-pointer text-xs transition-colors"
                 >
                   Tambah Event
                 </button>
@@ -502,31 +333,15 @@ export default function RundownScheduling() {
             </div>
 
             {/* Artist Form */}
-            <div style={{
-              backgroundColor: "#ffffff",
-              border: "1px solid #e2e8f0",
-              borderRadius: "12px",
-              padding: "20px",
-              boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.05)"
-            }}>
-              <h3 style={{ fontSize: "14px", fontWeight: "700", color: "#0f172a", margin: "0 0 12px 0" }}>🎸 Registrasi Musisi / Artis</h3>
-              <form onSubmit={handleAddArtist} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            <div className="bg-white border border-zinc-200 rounded-2xl p-5 shadow-sm box-border">
+              <h3 className="text-xs font-bold text-slate-800 m-0 mb-3">🎸 Registrasi Musisi / Artis</h3>
+              <form onSubmit={handleAddArtist} className="flex flex-col gap-2.5">
                 <input
                   type="text"
                   placeholder="Nama Band / DJ / Artis"
                   value={newArtistName}
                   onChange={(e) => setNewArtistName(e.target.value)}
-                  style={{
-                    width: "100%",
-                    boxSizing: "border-box",
-                    backgroundColor: "#f8fafc",
-                    border: "1px solid #e2e8f0",
-                    borderRadius: "8px",
-                    padding: "8px 12px",
-                    fontSize: "12px",
-                    color: "#0f172a",
-                    outline: "none"
-                  }}
+                  className="w-full bg-zinc-50 border border-zinc-200 rounded-lg py-2 px-3 text-xs text-zinc-900 placeholder-zinc-400 outline-none focus:border-indigo-500 transition-colors box-border"
                   required
                 />
                 <input
@@ -534,30 +349,11 @@ export default function RundownScheduling() {
                   placeholder="Genre (misal: Rock, Jazz, EDM)"
                   value={newArtistGenre}
                   onChange={(e) => setNewArtistGenre(e.target.value)}
-                  style={{
-                    width: "100%",
-                    boxSizing: "border-box",
-                    backgroundColor: "#f8fafc",
-                    border: "1px solid #e2e8f0",
-                    borderRadius: "8px",
-                    padding: "8px 12px",
-                    fontSize: "12px",
-                    color: "#0f172a",
-                    outline: "none"
-                  }}
+                  className="w-full bg-zinc-50 border border-zinc-200 rounded-lg py-2 px-3 text-xs text-zinc-900 placeholder-zinc-400 outline-none focus:border-indigo-500 transition-colors box-border"
                 />
                 <button
                   type="submit"
-                  style={{
-                    backgroundColor: "#0f172a",
-                    color: "#ffffff",
-                    border: "none",
-                    fontWeight: "700",
-                    padding: "8px",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                    fontSize: "11px"
-                  }}
+                  className="w-full bg-slate-800 hover:bg-slate-900 text-white border-none font-bold py-2 rounded-lg cursor-pointer text-xs transition-colors"
                 >
                   Registrasi Artis
                 </button>
@@ -567,59 +363,31 @@ export default function RundownScheduling() {
         </div>
 
         {/* Right Side: Timeline Rundown List */}
-        <div style={{
-          backgroundColor: "#ffffff",
-          border: "1px solid #e2e8f0",
-          borderRadius: "12px",
-          padding: "24px",
-          boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.05)"
-        }}>
-          <h2 style={{ fontSize: "16px", fontWeight: "700", color: "#0f172a", margin: "0 0 16px 0" }}>Jadwal Rundown & Panggung</h2>
+        <div className="bg-white border border-zinc-200 rounded-2xl p-6 shadow-sm box-border">
+          <h2 className="text-sm font-bold text-slate-800 m-0 mb-4">Jadwal Rundown & Panggung</h2>
           
           {schedules.length > 0 ? (
-            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            <div className="flex flex-col gap-4">
               {schedules.map((sch) => (
-                <div key={sch.idJadwal} style={{
-                  padding: "16px",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "10px",
-                  backgroundColor: "#fafafa",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center"
-                }}>
+                <div key={sch.idJadwal} className="p-4 border border-zinc-200 rounded-xl bg-zinc-50/50 flex justify-between items-center box-border">
                   <div>
-                    <span style={{
-                      fontSize: "10px",
-                      fontWeight: "800",
-                      backgroundColor: sch.panggung === "Main Stage" ? "#eeebff" : "#fffbeb",
-                      color: sch.panggung === "Main Stage" ? "#4f46e5" : "#d97706",
-                      padding: "2px 8px",
-                      borderRadius: "4px"
-                    }}>
+                    <span className={`text-[10px] font-bold py-0.5 px-2.5 rounded ${
+                      sch.panggung === "Main Stage" ? "bg-indigo-50 text-indigo-600" : "bg-amber-50 text-amber-600"
+                    }`}>
                       ⚡ {sch.panggung}
                     </span>
-                    <h3 style={{ fontSize: "15px", fontWeight: "800", color: "#0f172a", margin: "8px 0 4px 0" }}>
+                    <h3 className="text-sm font-bold text-slate-800 mt-2 mb-1">
                       {sch.artistName}
                     </h3>
-                    <p style={{ fontSize: "11px", color: "#64748b", margin: "0 0 4px 0" }}>🏆 {sch.eventName}</p>
-                    <div style={{ fontSize: "12px", color: "#475569", fontWeight: "600" }}>
+                    <p className="text-[11px] text-zinc-400 m-0 mb-1">🏆 {sch.eventName}</p>
+                    <div className="text-xs text-slate-700 font-semibold">
                       🕐 {formatDateTime(sch.startTime)} - {sch.endTime.split("T")[1]}
                     </div>
                   </div>
 
                   <button
                     onClick={() => handleDeleteSchedule(sch.idJadwal)}
-                    style={{
-                      fontSize: "11px",
-                      fontWeight: "700",
-                      color: "#ef4444",
-                      backgroundColor: "#fef2f2",
-                      border: "1px solid #fee2e2",
-                      padding: "6px 10px",
-                      borderRadius: "6px",
-                      cursor: "pointer"
-                    }}
+                    className="text-xs font-bold text-red-500 bg-red-50 hover:bg-red-100 border border-red-100 py-1.5 px-3 rounded-lg cursor-pointer transition-colors"
                   >
                     🗑️ Hapus
                   </button>
@@ -627,14 +395,8 @@ export default function RundownScheduling() {
               ))}
             </div>
           ) : (
-            <div style={{
-              padding: "24px",
-              textAlign: "center",
-              border: "1px solid #e2e8f0",
-              borderRadius: "8px",
-              backgroundColor: "#fafafa"
-            }}>
-              <p style={{ fontSize: "13px", color: "#64748b", margin: 0 }}>Belum ada jadwal rundown yang terdaftar.</p>
+            <div className="p-6 text-center border border-zinc-200 rounded-xl bg-zinc-50">
+              <p className="text-xs text-zinc-500 m-0">Belum ada jadwal rundown yang terdaftar.</p>
             </div>
           )}
         </div>

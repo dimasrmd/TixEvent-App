@@ -1,15 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
-interface StaffMember {
-  idUser: string;
-  nama: string;
-  email: string;
-  noHp: string;
-  role: "KRU" | "PANITIA";
-  status: "AKTIF" | "CUTI";
-}
+import { StaffMember } from "../../../lib/types";
+import Card from "../../../components/ui/Card";
+import Button from "../../../components/ui/Button";
+import Input from "../../../components/ui/Input";
+import Select from "../../../components/ui/Select";
 
 export default function StaffManagement() {
   const [role, setRole] = useState<"KRU" | "PANITIA">("KRU");
@@ -78,257 +74,118 @@ export default function StaffManagement() {
   return (
     <div>
       {/* Title Header */}
-      <div style={{ marginBottom: "24px" }}>
-        <h1 style={{ fontSize: "24px", fontWeight: "800", color: "#0f172a", margin: "0 0 4px 0" }}>Manajemen Staf Internal</h1>
-        <p style={{ fontSize: "13px", color: "#64748b", margin: 0 }}>Daftarkan akun staf baru (Kru Lapangan / Panitia Gate) dan tinjau daftar kru aktif</p>
+      <div className="mb-6">
+        <h1 className="text-2xl font-black text-slate-800 m-0 mb-1">Manajemen Staf Internal</h1>
+        <p className="text-xs text-slate-500 m-0">Daftarkan akun staf baru (Kru Lapangan / Panitia Gate) dan tinjau daftar kru aktif</p>
       </div>
 
       {success && (
-        <div style={{
-          marginBottom: "20px",
-          padding: "12px 16px",
-          borderRadius: "8px",
-          backgroundColor: "#ecfdf5",
-          border: "1px solid #a7f3d0",
-          color: "#059669",
-          fontSize: "13px",
-          fontWeight: "600"
-        }}>
+        <div className="mb-5 py-3 px-4 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-600 text-xs font-semibold">
           ✅ {success}
         </div>
       )}
 
       {error && (
-        <div style={{
-          marginBottom: "20px",
-          padding: "12px 16px",
-          borderRadius: "8px",
-          backgroundColor: "#fef2f2",
-          border: "1px solid #fecaca",
-          color: "#dc2626",
-          fontSize: "13px",
-          fontWeight: "600"
-        }}>
+        <div className="mb-5 py-3 px-4 rounded-lg bg-red-50 border border-red-200 text-red-650 text-xs font-semibold">
           ❌ {error}
         </div>
       )}
 
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1.8fr",
-        gap: "24px",
-        alignItems: "start"
-      }}>
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_1.8fr] gap-6 items-start">
         {/* Left Form: Add New Staff */}
-        <div style={{
-          backgroundColor: "#ffffff",
-          border: "1px solid #e2e8f0",
-          borderRadius: "12px",
-          padding: "24px",
-          boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.05)"
-        }}>
-          <h2 style={{ fontSize: "16px", fontWeight: "700", color: "#0f172a", margin: "0 0 16px 0" }}>Tambah Staf Baru</h2>
-          <form onSubmit={handleRegister} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              <label style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.05em", color: "#64748b" }}>
-                Pilih Peran Staf
-              </label>
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value as "KRU" | "PANITIA")}
-                style={{
-                  width: "100%",
-                  boxSizing: "border-box",
-                  backgroundColor: "#f8fafc",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "8px",
-                  padding: "8px 12px",
-                  fontSize: "13px",
-                  color: "#0f172a",
-                  outline: "none",
-                  fontWeight: "600",
-                  cursor: "pointer"
-                }}
-              >
-                <option value="KRU">Kru Lapangan (Staff Absensi)</option>
-                <option value="PANITIA">Panitia (Gate Keeper Check-In)</option>
-              </select>
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              <label style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.05em", color: "#64748b" }} htmlFor="nama">
-                Nama Lengkap
-              </label>
-              <input
-                id="nama"
-                type="text"
-                value={nama}
-                onChange={(e) => setNama(e.target.value)}
-                placeholder="Masukkan nama lengkap"
-                style={{
-                  width: "100%",
-                  boxSizing: "border-box",
-                  backgroundColor: "#f8fafc",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "8px",
-                  padding: "8px 12px",
-                  fontSize: "13px",
-                  color: "#0f172a",
-                  outline: "none"
-                }}
-                required
-              />
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              <label style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.05em", color: "#64748b" }} htmlFor="email">
-                Email Kerja
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="staf@tixevent.com"
-                style={{
-                  width: "100%",
-                  boxSizing: "border-box",
-                  backgroundColor: "#f8fafc",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "8px",
-                  padding: "8px 12px",
-                  fontSize: "13px",
-                  color: "#0f172a",
-                  outline: "none"
-                }}
-                required
-              />
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              <label style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.05em", color: "#64748b" }} htmlFor="password">
-                Kata Sandi (Password)
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                style={{
-                  width: "100%",
-                  boxSizing: "border-box",
-                  backgroundColor: "#f8fafc",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "8px",
-                  padding: "8px 12px",
-                  fontSize: "13px",
-                  color: "#0f172a",
-                  outline: "none"
-                }}
-                required
-              />
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              <label style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.05em", color: "#64748b" }} htmlFor="noHp">
-                Nomor Telepon (HP)
-              </label>
-              <input
-                id="noHp"
-                type="tel"
-                value={noHp}
-                onChange={(e) => setNoHp(e.target.value)}
-                placeholder="0812XXXXXXXX"
-                style={{
-                  width: "100%",
-                  boxSizing: "border-box",
-                  backgroundColor: "#f8fafc",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "8px",
-                  padding: "8px 12px",
-                  fontSize: "13px",
-                  color: "#0f172a",
-                  outline: "none"
-                }}
-                required
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                width: "100%",
-                backgroundColor: "#4f46e5",
-                color: "#ffffff",
-                border: "none",
-                fontWeight: "700",
-                padding: "10px 12px",
-                borderRadius: "8px",
-                cursor: "pointer",
-                fontSize: "13px",
-                marginTop: "6px",
-                opacity: loading ? 0.7 : 1,
-                boxShadow: "0 2px 4px 0 rgba(79, 70, 229, 0.15)"
-              }}
+        <Card maxWidth="100%">
+          <h2 className="text-sm font-bold text-slate-800 m-0 mb-4">Tambah Staf Baru</h2>
+          <form onSubmit={handleRegister} className="flex flex-col gap-3.5">
+            <Select
+              id="role"
+              label="Pilih Peran Staf"
+              value={role}
+              onChange={(e) => setRole(e.target.value as "KRU" | "PANITIA")}
             >
-              {loading ? "Mendaftarkan..." : "➕ Daftarkan Akun Staf"}
-            </button>
+              <option value="KRU">Kru Lapangan (Staff Absensi)</option>
+              <option value="PANITIA">Panitia (Gate Keeper Check-In)</option>
+            </Select>
+
+            <Input
+              id="nama"
+              type="text"
+              label="Nama Lengkap"
+              value={nama}
+              onChange={(e) => setNama(e.target.value)}
+              placeholder="Masukkan nama lengkap"
+              required
+            />
+
+            <Input
+              id="email"
+              type="email"
+              label="Email Kerja"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="staf@tixevent.com"
+              required
+            />
+
+            <Input
+              id="password"
+              type="password"
+              label="Kata Sandi (Password)"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+            />
+
+            <Input
+              id="noHp"
+              type="tel"
+              label="Nomor Telepon (HP)"
+              value={noHp}
+              onChange={(e) => setNoHp(e.target.value)}
+              placeholder="0812XXXXXXXX"
+              required
+            />
+
+            <Button type="submit" loading={loading} className="mt-1 shadow-indigo-100">
+              ➕ Daftarkan Akun Staf
+            </Button>
           </form>
-        </div>
+        </Card>
 
         {/* Right Table: Active Staff list */}
-        <div style={{
-          backgroundColor: "#ffffff",
-          border: "1px solid #e2e8f0",
-          borderRadius: "12px",
-          padding: "24px",
-          boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.05)"
-        }}>
-          <h2 style={{ fontSize: "16px", fontWeight: "700", color: "#0f172a", margin: "0 0 16px 0" }}>Daftar Staf Aktif</h2>
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
+        <div className="bg-white border border-zinc-200 rounded-2xl p-6 shadow-sm box-border">
+          <h2 className="text-sm font-bold text-slate-800 m-0 mb-4">Daftar Staf Aktif</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-left text-xs">
               <thead>
-                <tr style={{ borderBottom: "2px solid #f1f5f9" }}>
-                  <th style={{ padding: "10px", color: "#64748b", fontWeight: "700" }}>ID STAF</th>
-                  <th style={{ padding: "10px", color: "#64748b", fontWeight: "700" }}>NAMA</th>
-                  <th style={{ padding: "10px", color: "#64748b", fontWeight: "700" }}>PERAN</th>
-                  <th style={{ padding: "10px", color: "#64748b", fontWeight: "700" }}>KONTAK</th>
-                  <th style={{ padding: "10px", color: "#64748b", fontWeight: "700" }}>STATUS</th>
+                <tr className="border-b-2 border-zinc-100">
+                  <th className="py-2.5 px-2 text-zinc-400 font-bold">ID STAF</th>
+                  <th className="py-2.5 px-2 text-zinc-400 font-bold">NAMA</th>
+                  <th className="py-2.5 px-2 text-zinc-400 font-bold">PERAN</th>
+                  <th className="py-2.5 px-2 text-zinc-400 font-bold">KONTAK</th>
+                  <th className="py-2.5 px-2 text-zinc-400 font-bold">STATUS</th>
                 </tr>
               </thead>
               <tbody>
                 {staffList.map((staf) => (
-                  <tr key={staf.idUser} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                    <td style={{ padding: "12px 10px", fontWeight: "700", color: "#64748b" }}>{staf.idUser}</td>
-                    <td style={{ padding: "12px 10px", fontWeight: "600", color: "#0f172a" }}>{staf.nama}</td>
-                    <td style={{ padding: "12px 10px" }}>
-                      <span style={{
-                        fontSize: "10px",
-                        fontWeight: "800",
-                        padding: "3px 8px",
-                        borderRadius: "4px",
-                        backgroundColor: staf.role === "PANITIA" ? "#e0e7ff" : "#ecfdf5",
-                        color: staf.role === "PANITIA" ? "#4f46e5" : "#059669"
-                      }}>
+                  <tr key={staf.idUser} className="border-b border-zinc-100 hover:bg-zinc-50/50">
+                    <td className="py-3 px-2 font-bold text-zinc-400">{staf.idUser}</td>
+                    <td className="py-3 px-2 font-semibold text-slate-800">{staf.nama}</td>
+                    <td className="py-3 px-2">
+                      <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded ${
+                        staf.role === "PANITIA"
+                          ? "bg-indigo-50 text-indigo-600"
+                          : "bg-emerald-50 text-emerald-600"
+                      }`}>
                         {staf.role}
                       </span>
                     </td>
-                    <td style={{ padding: "12px 10px" }}>
-                      <div style={{ color: "#0f172a" }}>{staf.email}</div>
-                      <div style={{ fontSize: "11px", color: "#64748b" }}>📱 {staf.noHp}</div>
+                    <td className="py-3 px-2">
+                      <div className="text-slate-800 font-medium">{staf.email}</div>
+                      <div className="text-[10px] text-zinc-400 mt-0.5">📱 {staf.noHp}</div>
                     </td>
-                    <td style={{ padding: "12px 10px" }}>
-                      <span style={{
-                        fontSize: "10px",
-                        fontWeight: "700",
-                        padding: "2px 6px",
-                        borderRadius: "4px",
-                        backgroundColor: "#f0fdf4",
-                        color: "#16a34a",
-                        border: "1px solid #bbf7d0"
-                      }}>
+                    <td className="py-3 px-2">
+                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-50/50 text-emerald-600 border border-emerald-100">
                         {staf.status}
                       </span>
                     </td>

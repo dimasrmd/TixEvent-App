@@ -1,6 +1,53 @@
 @import "tailwindcss";
 
-/* Material Symbols Outlined Font mapping */
+/* --------------------------------------------------
+   1. CSS Variables & Theme Config (Tailwind CSS v4)
+   -------------------------------------------------- */
+:root {
+  --background: #09090b;
+  --foreground: #e5e1e4;
+  --primary: #c0c1ff;
+  --secondary: #4cd7f6;
+  --tertiary: #4edea3;
+  --surface: #131315;
+  --on-surface: #e5e1e4;
+  --on-surface-variant: #c7c4d7;
+  --outline: #908fa0;
+  --on-secondary: #003640;
+  --on-tertiary: #003824;
+  --error: #ffb4ab;
+}
+
+@theme {
+  --color-background: var(--background);
+  --color-on-background: var(--foreground);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-tertiary: var(--tertiary);
+  --color-surface: var(--surface);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-outline: var(--outline);
+  --color-on-secondary: var(--on-secondary);
+  --color-on-tertiary: var(--on-tertiary);
+  --color-error: var(--error);
+  
+  --font-sans: var(--font-outfit), sans-serif;
+  
+  --spacing-margin-mobile: 16px;
+  --spacing-margin-desktop: 48px;
+  --spacing-xs: 8px;
+  --spacing-sm: 16px;
+  --spacing-md: 24px;
+  --spacing-lg: 40px;
+  --spacing-xl: 64px;
+  --spacing-base: 4px;
+  --spacing-gutter: 24px;
+}
+
+/* --------------------------------------------------
+   2. Font Mappings
+   -------------------------------------------------- */
 .material-symbols-outlined {
   font-family: 'Material Symbols Outlined' !important;
   font-weight: normal;
@@ -17,39 +64,9 @@
   -webkit-font-smoothing: antialiased;
 }
 
-:root {
-  --background: #09090b;
-  --foreground: #e5e1e4;
-}
-
-
-@theme {
-  --color-background: #09090b;
-  --color-on-background: #e5e1e4;
-  --color-primary: #c0c1ff;
-  --color-secondary: #4cd7f6;
-  --color-tertiary: #4edea3;
-  --color-surface: #131315;
-  --color-on-surface: #e5e1e4;
-  --color-on-surface-variant: #c7c4d7;
-  --color-outline: #908fa0;
-  --color-on-secondary: #003640;
-  --color-on-tertiary: #003824;
-  --color-error: #ffb4ab;
-  
-  --font-sans: var(--font-outfit), sans-serif;
-  
-  --spacing-margin-mobile: 16px;
-  --spacing-margin-desktop: 48px;
-  --spacing-xs: 8px;
-  --spacing-sm: 16px;
-  --spacing-md: 24px;
-  --spacing-lg: 40px;
-  --spacing-xl: 64px;
-  --spacing-base: 4px;
-  --spacing-gutter: 24px;
-}
-
+/* --------------------------------------------------
+   3. Base Element Styles
+   -------------------------------------------------- */
 body {
   background-color: var(--background);
   color: var(--foreground);
@@ -58,7 +75,30 @@ body {
   min-height: max(884px, 100dvh);
 }
 
-/* Custom Design Utilities */
+/* --------------------------------------------------
+   4. Custom Scrollbar Styling (Global)
+   -------------------------------------------------- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #09090b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #353437;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #464554;
+}
+
+/* --------------------------------------------------
+   5. Custom Utilities & Typography Adapters
+   -------------------------------------------------- */
 @utility glass-card {
   background: rgba(24, 24, 27, 0.6);
   backdrop-filter: blur(12px);
@@ -85,13 +125,14 @@ body {
 
 @utility no-scrollbar {
   -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  scrollbar-width: none;     /* Firefox */
+  
   &::-webkit-scrollbar {
-    display: none; /* Chrome, Safari and Opera */
+    display: none;           /* Chrome, Safari and Opera */
   }
 }
 
-/* Stitch custom typography adapters mapped to Tailwind CSS v4 */
+/* Custom typography adapters mapped to Tailwind CSS v4 */
 @utility font-headline-lg-mobile {
   font-family: var(--font-outfit), sans-serif;
 }
@@ -160,20 +201,4 @@ body {
   line-height: 28px;
   letter-spacing: -0.01em;
   font-weight: 600;
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background: #09090b;
-}
-::-webkit-scrollbar-thumb {
-  background: #353437;
-  border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #464554;
 }

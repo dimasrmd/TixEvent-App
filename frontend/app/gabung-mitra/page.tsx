@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
 
 export default function PartnerRegister() {
   const [nama, setNama] = useState("");
@@ -39,204 +42,83 @@ export default function PartnerRegister() {
   };
 
   return (
-    <main style={{
-      minHeight: "100vh",
-      backgroundColor: "#ffffff",
-      color: "#09090b",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: "24px",
-      fontFamily: "sans-serif",
-      boxSizing: "border-box"
-    }}>
-      <div style={{
-        width: "100%",
-        maxWidth: "450px",
-        padding: "32px",
-        border: "1px solid #e4e4e7",
-        borderRadius: "16px",
-        boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-        boxSizing: "border-box",
-        backgroundColor: "#ffffff"
-      }}>
-        <div style={{ textAlign: "center", marginBottom: "24px" }}>
-          <Link href="/" style={{
-            fontSize: "24px",
-            fontWeight: "800",
-            letterSpacing: "-0.05em",
-            color: "#059669",
-            textDecoration: "none"
-          }}>
+    <main className="min-h-screen bg-white text-zinc-900 flex flex-col items-center justify-center p-6 font-sans box-border">
+      <Card maxWidth="450px">
+        <div className="text-center mb-6">
+          <Link href="/" className="text-2xl font-extrabold tracking-tight text-emerald-600 no-underline">
             TIXEVENT MITRA
           </Link>
-          <h2 style={{ fontSize: "20px", fontWeight: "700", color: "#18181b", margin: "16px 0 4px 0" }}>Registrasi Mitra (Tenant)</h2>
-          <p style={{ fontSize: "12px", color: "#71717a", margin: 0 }}>Daftarkan akun penyewa booth stan di TixEvent (Simulasi Frontend)</p>
+          <h2 className="text-xl font-bold text-zinc-850 mt-4 mb-1">Registrasi Mitra (Tenant)</h2>
+          <p className="text-xs text-zinc-500 m-0">Daftarkan akun penyewa booth stan di TixEvent (Simulasi Frontend)</p>
         </div>
 
         {error && (
-          <div style={{
-            marginBottom: "16px",
-            padding: "12px",
-            borderRadius: "8px",
-            backgroundColor: "#fef2f2",
-            border: "1px solid #fecaca",
-            color: "#dc2626",
-            fontSize: "12px",
-            fontWeight: "600"
-          }}>
+          <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-xs font-semibold">
             {error}
           </div>
         )}
 
         {success && (
-          <div style={{
-            marginBottom: "16px",
-            padding: "12px",
-            borderRadius: "8px",
-            backgroundColor: "#ecfdf5",
-            border: "1px solid #a7f3d0",
-            color: "#059669",
-            fontSize: "12px",
-            fontWeight: "600",
-            lineHeight: "1.4"
-          }}>
+          <div className="mb-4 p-3 rounded-lg bg-emerald-50 border border-emerald-250 text-emerald-600 text-xs font-semibold leading-relaxed">
             {success}
           </div>
         )}
 
-        <form onSubmit={handleRegister} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            <label style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.05em", color: "#71717a" }} htmlFor="nama">
-              Nama Lengkap Mitra
-            </label>
-            <input
-              id="nama"
-              type="text"
-              value={nama}
-              onChange={(e) => setNama(e.target.value)}
-              placeholder="Masukkan nama pemilik usaha"
-              style={{
-                width: "100%",
-                boxSizing: "border-box",
-                backgroundColor: "#fafafa",
-                border: "1px solid #e4e4e7",
-                borderRadius: "8px",
-                padding: "8px 12px",
-                fontSize: "13px",
-                color: "#18181b",
-                outline: "none"
-              }}
-              required
-            />
-          </div>
+        <form onSubmit={handleRegister} className="flex flex-col gap-3.5">
+          <Input
+            id="nama"
+            type="text"
+            label="Nama Lengkap Mitra"
+            value={nama}
+            onChange={(e) => setNama(e.target.value)}
+            placeholder="Masukkan nama pemilik usaha"
+            required
+          />
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            <label style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.05em", color: "#71717a" }} htmlFor="email">
-              Email Usaha
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="mitra@email.com"
-              style={{
-                width: "100%",
-                boxSizing: "border-box",
-                backgroundColor: "#fafafa",
-                border: "1px solid #e4e4e7",
-                borderRadius: "8px",
-                padding: "8px 12px",
-                fontSize: "13px",
-                color: "#18181b",
-                outline: "none"
-              }}
-              required
-            />
-          </div>
+          <Input
+            id="email"
+            type="email"
+            label="Email Usaha"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="mitra@email.com"
+            required
+          />
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            <label style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.05em", color: "#71717a" }} htmlFor="noHp">
-              Nomor Telepon (No. HP)
-            </label>
-            <input
-              id="noHp"
-              type="tel"
-              value={noHp}
-              onChange={(e) => setNoHp(e.target.value)}
-              placeholder="08123456789"
-              style={{
-                width: "100%",
-                boxSizing: "border-box",
-                backgroundColor: "#fafafa",
-                border: "1px solid #e4e4e7",
-                borderRadius: "8px",
-                padding: "8px 12px",
-                fontSize: "13px",
-                color: "#18181b",
-                outline: "none"
-              }}
-              required
-            />
-          </div>
+          <Input
+            id="noHp"
+            type="tel"
+            label="Nomor Telepon (No. HP)"
+            value={noHp}
+            onChange={(e) => setNoHp(e.target.value)}
+            placeholder="08123456789"
+            required
+          />
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            <label style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.05em", color: "#71717a" }} htmlFor="password">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              style={{
-                width: "100%",
-                boxSizing: "border-box",
-                backgroundColor: "#fafafa",
-                border: "1px solid #e4e4e7",
-                borderRadius: "8px",
-                padding: "8px 12px",
-                fontSize: "13px",
-                color: "#18181b",
-                outline: "none"
-              }}
-              required
-            />
-          </div>
+          <Input
+            id="password"
+            type="password"
+            label="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            required
+          />
 
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              width: "100%",
-              backgroundColor: "#059669",
-              color: "#ffffff",
-              border: "none",
-              fontWeight: "600",
-              padding: "11px",
-              borderRadius: "8px",
-              cursor: "pointer",
-              fontSize: "13px",
-              marginTop: "8px",
-              opacity: loading ? 0.7 : 1
-            }}
-          >
-            {loading ? "Memproses..." : "Gabung Mitra"}
-          </button>
+          <Button type="submit" variant="secondary" loading={loading} className="mt-2">
+            Gabung Mitra
+          </Button>
         </form>
 
-        <div style={{ marginTop: "24px", textAlign: "center" }}>
-          <p style={{ fontSize: "12px", color: "#71717a", margin: 0 }}>
+        <div className="mt-6 text-center">
+          <p className="text-xs text-zinc-500 m-0">
             Sudah punya akun?{" "}
-            <Link href="/mitra/login" style={{ color: "#059669", fontWeight: "600", textDecoration: "none" }}>
+            <Link href="/mitra/login" className="text-emerald-600 font-semibold no-underline hover:underline">
               Masuk Disini
             </Link>
           </p>
         </div>
-      </div>
+      </Card>
     </main>
   );
 }
