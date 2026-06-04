@@ -43,8 +43,8 @@ export default function ManagerLayout({
     // Clear localStorage
     localStorage.clear();
     
-    // Redirect to home
-    window.location.href = "/";
+    // Redirect to staff portal login page
+    window.location.href = "/portal-admin";
   };
 
   if (!mounted) {
