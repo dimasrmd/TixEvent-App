@@ -113,6 +113,8 @@ export default function RundownScheduling() {
     localStorage.setItem("tixevent_events", JSON.stringify(updated));
     setSelectedEventId(newEvt.idEvent);
     setNewEventName("");
+    setNewStageName("Main Stage");
+    setNewLocation("Pusat Niaga Kemayoran");
     setSuccess(`Event "${newEvt.eventName}" berhasil ditambahkan!`);
     setTimeout(() => setSuccess(""), 3000);
   };
@@ -320,6 +322,22 @@ export default function RundownScheduling() {
                   placeholder="Nama Event Konser"
                   value={newEventName}
                   onChange={(e) => setNewEventName(e.target.value)}
+                  className="w-full bg-zinc-50 border border-zinc-200 rounded-lg py-2 px-3 text-xs text-zinc-900 placeholder-zinc-400 outline-none focus:border-indigo-500 transition-colors box-border"
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Nama Panggung (misal: Main Stage)"
+                  value={newStageName}
+                  onChange={(e) => setNewStageName(e.target.value)}
+                  className="w-full bg-zinc-50 border border-zinc-200 rounded-lg py-2 px-3 text-xs text-zinc-900 placeholder-zinc-400 outline-none focus:border-indigo-500 transition-colors box-border"
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Lokasi Event (misal: Arena Barat)"
+                  value={newLocation}
+                  onChange={(e) => setNewLocation(e.target.value)}
                   className="w-full bg-zinc-50 border border-zinc-200 rounded-lg py-2 px-3 text-xs text-zinc-900 placeholder-zinc-400 outline-none focus:border-indigo-500 transition-colors box-border"
                   required
                 />
