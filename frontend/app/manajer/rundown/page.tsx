@@ -300,6 +300,22 @@ export default function RundownScheduling() {
                   className="w-full bg-zinc-50 border border-zinc-200 rounded-lg py-2 px-3 text-xs text-zinc-900 placeholder-zinc-400 outline-none focus:border-indigo-500 transition-colors box-border"
                   required
                 />
+                <input
+                  type="text"
+                  placeholder="Nama Panggung (misal: Main Stage)"
+                  value={newStageName}
+                  onChange={(e) => setNewStageName(e.target.value)}
+                  className="w-full bg-zinc-50 border border-zinc-200 rounded-lg py-2 px-3 text-xs text-zinc-900 placeholder-zinc-400 outline-none focus:border-indigo-500 transition-colors box-border"
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Lokasi Event (misal: Arena Barat)"
+                  value={newLocation}
+                  onChange={(e) => setNewLocation(e.target.value)}
+                  className="w-full bg-zinc-50 border border-zinc-200 rounded-lg py-2 px-3 text-xs text-zinc-900 placeholder-zinc-400 outline-none focus:border-indigo-500 transition-colors box-border"
+                  required
+                />
                 <button
                   type="submit"
                   className="w-full bg-slate-800 hover:bg-slate-900 text-white border-none font-bold py-2 rounded-lg cursor-pointer text-xs transition-colors"

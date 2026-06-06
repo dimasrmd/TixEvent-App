@@ -10,6 +10,20 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/panitia/checkin",
+        destination: "/panitia/check-in",
+        permanent: true,
+      },
+      {
+        source: "/kru/absensi",
+        destination: "/crew/absensi",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
