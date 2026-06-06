@@ -24,4 +24,9 @@ public class KeuanganRestController {
     public FinancialReport getLaporan() {
         return keuanganService.getLaporanTerkini();
     }
+
+    @GetMapping("/transaksi")
+    public java.util.List<com.tixevent.backend.entity.Transaksi> getTransaksi() {
+        return keuanganService.getAllTransaksi();
+    }
 }

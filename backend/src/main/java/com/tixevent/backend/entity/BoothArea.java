@@ -16,7 +16,6 @@ public class BoothArea {
 
     @OneToOne
     @JoinColumn(name = "id_tenant_fk", unique = true)
-    @JsonIgnore
     private Tenant tenant;
 
     @ManyToOne

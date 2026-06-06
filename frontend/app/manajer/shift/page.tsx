@@ -47,8 +47,8 @@ export default function ShiftScheduling() {
         // Pemetaan dari entity backend ke UI
         const mappedShifts = data.map((s: any) => ({
           idShift: s.idShift || s.id,
-          idCrew: s.kru?.idUser || s.kru?.id || "N/A",
-          crewName: s.kru?.nama || "Unknown Crew",
+          idCrew: s.crew?.idUser || s.crew?.id || "N/A",
+          crewName: s.crew?.nama || "Unknown Crew",
           tanggal: s.tanggal,
           jamMulai: s.jamMulai,
           jamSelesai: s.jamSelesai,
@@ -82,9 +82,9 @@ export default function ShiftScheduling() {
       const selectedCrewObj = crews.find((c: any) => (c.idUser || c.id) === idCrew);
       const crewName = selectedCrewObj ? selectedCrewObj.nama : "Kru Lapangan";
 
-      // Sesuaikan object yang dikirim dengan requirement entity CrewShift
+      // Sesuaikan object yang dikirim dengan requirement backend
       const payload = {
-        kru: { idUser: idCrew },
+        idCrew,
         tanggal,
         jamMulai,
         jamSelesai,

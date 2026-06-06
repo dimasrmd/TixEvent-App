@@ -23,12 +23,25 @@ export default function StaffManagement() {
 
   const fetchStaff = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/kru/crews`);
-      if (response.ok) {
-        const data = await response.json();
-        // Pastikan format respons dari Backend sesuai dengan interface StaffMember
-        setStaffList(data);
+      let combinedStaff: StaffMember[] = [];
+
+      // Ambil data Kru
+      const resCrew = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/kru/crews`);
+      if (resCrew.ok) {
+        const dataCrew = await resCrew.json();
+        const mappedCrew = dataCrew.map((c: any) => ({ ...c, role: c.role || "KRU" }));
+        combinedStaff = [...combinedStaff, ...mappedCrew];
       }
+
+      // Ambil data Panitia
+      const resPanitia = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/kru/panitia`);
+      if (resPanitia.ok) {
+        const dataPanitia = await resPanitia.json();
+        const mappedPanitia = dataPanitia.map((p: any) => ({ ...p, role: p.role || "PANITIA" }));
+        combinedStaff = [...combinedStaff, ...mappedPanitia];
+      }
+
+      setStaffList(combinedStaff);
     } catch (err) {
       console.error("Gagal mengambil daftar staf:", err);
     }
@@ -171,7 +184,6 @@ export default function StaffManagement() {
                   <th className="py-2.5 px-2 text-zinc-400 font-bold">NAMA</th>
                   <th className="py-2.5 px-2 text-zinc-400 font-bold">PERAN</th>
                   <th className="py-2.5 px-2 text-zinc-400 font-bold">KONTAK</th>
-                  <th className="py-2.5 px-2 text-zinc-400 font-bold">STATUS</th>
                 </tr>
               </thead>
               <tbody>
@@ -191,11 +203,6 @@ export default function StaffManagement() {
                     <td className="py-3 px-2">
                       <div className="text-slate-800 font-medium">{staf.email}</div>
                       <div className="text-[10px] text-zinc-400 mt-0.5">📱 {staf.noHp}</div>
-                    </td>
-                    <td className="py-3 px-2">
-                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-50/50 text-emerald-600 border border-emerald-100">
-                        {staf.status}
-                      </span>
                     </td>
                   </tr>
                 ))}

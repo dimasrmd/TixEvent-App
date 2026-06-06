@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Card from "../../../components/ui/Card";
 import Button from "../../../components/ui/Button";
@@ -19,32 +19,31 @@ export default function TenantBoothSelection() {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
-  // Mock list of empty booths matching BoothArea fields
-  const [booths, setBooths] = useState<BoothSpot[]>([
-    {
-      idBooth: "BTH-A01",
-      nomorBooth: "A01",
-      lokasiBooth: "Food Court Utara",
-      hargaSewa: "Rp 5.000.000",
-      keterangan: "Dekat pintu masuk utama konser (Aliran Listrik 900W)"
-    },
-    {
-      idBooth: "BTH-A02",
-      nomorBooth: "A02",
-      lokasiBooth: "Food Court Selatan",
-      hargaSewa: "Rp 4.500.000",
-      keterangan: "Sisi teduh sebelah Cyber Stage (Aliran Listrik 900W)"
-    },
-    {
-      idBooth: "BTH-B03",
-      nomorBooth: "B03",
-      lokasiBooth: "Merchandise Alley",
-      hargaSewa: "Rp 7.500.000",
-      keterangan: "Tepat di sebelah antrean tiket VIP (Aliran Listrik 1300W)"
-    }
-  ]);
+  const [booths, setBooths] = useState<BoothSpot[]>([]);
 
-  const handleRent = (e: React.FormEvent) => {
+  useEffect(() => {
+    const fetchBooths = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tenant/booth-kosong`);
+        if (res.ok) {
+          const data = await res.json();
+          const mapped = data.map((b: any) => ({
+            idBooth: b.idBooth,
+            nomorBooth: b.nomorBooth,
+            lokasiBooth: b.lokasiBooth,
+            hargaSewa: new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(b.hargaSewa),
+            keterangan: "Siap untuk disewa Mitra"
+          }));
+          setBooths(mapped);
+        }
+      } catch (err) {
+        console.error("Gagal menarik data booth", err);
+      }
+    };
+    fetchBooths();
+  }, []);
+
+  const handleRent = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedBoothId) {
       setError("Silakan pilih salah satu nomor booth!");
@@ -55,15 +54,35 @@ export default function TenantBoothSelection() {
     setError("");
     setSuccess("");
 
-    setTimeout(() => {
+    try {
+      const tenantId = localStorage.getItem("idUser");
+      if (!tenantId) {
+        throw new Error("Sesi Tenant tidak ditemukan. Silakan login kembali.");
+      }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tenant/bayar`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idBooth: selectedBoothId, idTenant: tenantId })
+      });
+
+      const dataText = await response.text();
+
+      if (!response.ok || dataText.startsWith("Gagal")) {
+        throw new Error(dataText || "Gagal menyewa booth");
+      }
+
       const chosenBooth = booths.find((b) => b.idBooth === selectedBoothId);
-      setSuccess(`Berhasil menyewa Booth ${chosenBooth?.nomorBooth} (${chosenBooth?.lokasiBooth})! Tim Keuangan Mitra akan segera memverifikasi.`);
+      setSuccess(`Berhasil menyewa Booth ${chosenBooth?.nomorBooth} (${chosenBooth?.lokasiBooth})!`);
       
       // Remove rented booth from available list
       setBooths(booths.filter((b) => b.idBooth !== selectedBoothId));
       setSelectedBoothId("");
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
       setLoading(false);
-    }, 600);
+    }
   };
 
   return (
@@ -75,13 +94,13 @@ export default function TenantBoothSelection() {
         </div>
 
         {error && (
-          <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-xs font-semibold">
+          <div className="text-center mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-xs font-semibold">
             {error}
           </div>
         )}
 
         {success && (
-          <div className="mb-4 p-3 rounded-lg bg-emerald-50 border border-emerald-250 text-emerald-600 text-xs font-semibold leading-relaxed">
+          <div className="text-center mb-4 p-3 rounded-lg bg-emerald-50 border border-emerald-250 text-emerald-600 text-xs font-semibold leading-relaxed">
             {success}
           </div>
         )}

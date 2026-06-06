@@ -15,12 +15,14 @@ public class CheckInService {
 
     private final CheckInRepository checkInRepository;
     private final TiketRepository tiketRepository;
+    private final com.tixevent.backend.repository.RefundRepository refundRepository;
 
     // Constructor Injection untuk menghubungkan Service dengan Database
     @Autowired
-    public CheckInService(CheckInRepository checkInRepository, TiketRepository tiketRepository) {
+    public CheckInService(CheckInRepository checkInRepository, TiketRepository tiketRepository, com.tixevent.backend.repository.RefundRepository refundRepository) {
         this.checkInRepository = checkInRepository;
         this.tiketRepository = tiketRepository;
+        this.refundRepository = refundRepository;
     }
 
     /**
@@ -46,6 +48,15 @@ public class CheckInService {
         if (tiketDitemukan.cekStatus()) { // Sesuaikan nama method status (misal: isUsed() / getStatusDigunakan())
             System.out.println("Check-In Gagal: Tiket " + inputTicketCode + " sudah pernah digunakan!");
             return false;
+        }
+
+        // Validasi C: Pastikan tiket ini BUKAN dari transaksi yang sudah di-refund (dibatalkan)
+        if (tiketDitemukan.getTransaksi() != null) {
+            Optional<com.tixevent.backend.entity.Refund> refundOpt = refundRepository.findByTransaksi(tiketDitemukan.getTransaksi());
+            if (refundOpt.isPresent() && "APPROVED".equalsIgnoreCase(refundOpt.get().getStatusRefund())) {
+                System.out.println("Check-In Gagal: Tiket " + inputTicketCode + " telah dibatalkan karena refund dana sudah disetujui!");
+                return false;
+            }
         }
 
         // 2. Sukses: Ubah status tiket menjadi terpakai, lalu perbarui datanya di database

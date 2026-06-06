@@ -45,11 +45,12 @@ export default function AdminPortalLogin() {
 
       setSuccess(data.message || `Login Staf Sukses!`);
       
-      localStorage.setItem("role", data.role.toLowerCase());
+      const finalRole = (data.role || apiRole).toLowerCase();
+      localStorage.setItem("role", finalRole);
       localStorage.setItem("idUser", data.idUser);
       localStorage.setItem("nama", data.nama);
       
-      setCookie("role", data.role.toLowerCase(), 86400);
+      setCookie("role", finalRole, 86400);
       setCookie("idUser", data.idUser, 86400);
       setCookie("nama", data.nama, 86400);
 

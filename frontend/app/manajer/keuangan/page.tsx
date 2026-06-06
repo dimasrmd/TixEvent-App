@@ -32,13 +32,34 @@ export default function FinancialManagement() {
     
     const fetchMutasiKas = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/refund`);
-        if (response.ok) {
-          const data = await response.json();
-          // Filter hanya yang approved
-          const approvedRefunds = data.filter((r: any) => r.statusRefund === "APPROVED");
+        let allLogs: FinancialAuditLog[] = [];
+
+        // Fetch Inflows (Transaksi LUNAS)
+        const resTrans = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/keuangan/transaksi`);
+        if (resTrans.ok) {
+          const dataTrans = await resTrans.json();
+          const lunasTrans = dataTrans.filter((t: any) => t.statusPembayaran && t.statusPembayaran.toUpperCase() === "LUNAS");
+          const inflowLogs: FinancialAuditLog[] = lunasTrans.map((t: any) => {
+            const isTenant = t.user?.role?.toLowerCase() === "tenant";
+            return {
+              idTransaksi: t.idTransaksi,
+              item: isTenant ? `Penyewaan Booth Mitra` : `Pembelian Tiket Acara`,
+              nominal: t.totalBayar,
+              tipe: "INFLOW",
+              keterangan: isTenant ? `Mitra: ${t.user?.nama || "Tenant"}` : `Pembeli: ${t.user?.nama || "Penonton"}`,
+              waktu: t.tanggalTransaksi || "N/A"
+            };
+          });
+          allLogs = [...allLogs, ...inflowLogs];
+        }
+
+        // Fetch Outflows (Refund APPROVED)
+        const resRefund = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/refund`);
+        if (resRefund.ok) {
+          const dataRefund = await resRefund.json();
+          const approvedRefunds = dataRefund.filter((r: any) => r.statusRefund === "APPROVED");
           
-          const mutasiLogs: FinancialAuditLog[] = approvedRefunds.map((r: any) => ({
+          const outflowLogs: FinancialAuditLog[] = approvedRefunds.map((r: any) => ({
             idTransaksi: r.idRefund,
             item: `Refund Pembatalan Tiket (${r.transaksi?.idTransaksi || "N/A"})`,
             nominal: r.jumlahRefund,
@@ -47,8 +68,10 @@ export default function FinancialManagement() {
             waktu: "Disetujui Manajer"
           }));
           
-          setAuditLogs(mutasiLogs);
+          allLogs = [...allLogs, ...outflowLogs];
         }
+
+        setAuditLogs(allLogs);
       } catch (err) {
         console.error("Gagal memuat riwayat mutasi kas", err);
       }

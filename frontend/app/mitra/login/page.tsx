@@ -43,12 +43,13 @@ export default function TenantLogin() {
       setSuccess(data.message || "Login Tenant Sukses!");
       
       // Save data from backend
-      localStorage.setItem("role", data.role.toLowerCase());
+      const finalRole = (data.role || "tenant").toLowerCase();
+      localStorage.setItem("role", finalRole);
       localStorage.setItem("idUser", data.idUser);
       localStorage.setItem("nama", data.nama);
       
       // Save to cookies for middleware route guard checks
-      setCookie("role", data.role.toLowerCase(), 86400);
+      setCookie("role", finalRole, 86400);
       setCookie("idUser", data.idUser, 86400);
       setCookie("nama", data.nama, 86400);
 
