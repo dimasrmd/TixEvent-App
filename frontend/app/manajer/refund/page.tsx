@@ -6,80 +6,59 @@ import { RefundClaim } from "../../../lib/types";
 export default function RefundApproval() {
   const [refunds, setRefunds] = useState<RefundClaim[]>([]);
   const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
+
+  const fetchRefunds = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/refund`);
+      if (response.ok) {
+        const data = await response.json();
+        const mappedRefunds = data.map((r: any) => ({
+          idRefund: r.idRefund,
+          idTransaksi: r.transaksi?.idTransaksi || "N/A",
+          namaPengunjung: r.transaksi?.user?.nama || "Tanpa Nama",
+          jumlahRefund: r.jumlahRefund,
+          alasan: r.alasan,
+          statusRefund: r.statusRefund || "PENDING"
+        }));
+        setRefunds(mappedRefunds);
+      }
+    } catch (err) {
+      console.error("Gagal memuat antrean refund:", err);
+    }
+  };
 
   useEffect(() => {
-    const saved = localStorage.getItem("tixevent_refunds");
-    if (saved) {
-      setRefunds(JSON.parse(saved));
-    } else {
-      const defaultClaims: RefundClaim[] = [
-        {
-          idRefund: "RFD-MOCK-301",
-          idTransaksi: "TIX-VIP99A",
-          alasan: "Jadwal kerja bentrok tiba-tiba di hari konser",
-          jumlahRefund: 1200000,
-          statusRefund: "PENDING",
-          namaPengunjung: "Budi Santoso",
-          tanggalAjuan: "2026-06-01"
-        },
-        {
-          idRefund: "RFD-MOCK-302",
-          idTransaksi: "TIX-FEST88",
-          alasan: "Sakit demam berdarah dan harus dirawat",
-          jumlahRefund: 450000,
-          statusRefund: "PENDING",
-          namaPengunjung: "Dewi Lestari",
-          tanggalAjuan: "2026-06-01"
-        },
-        {
-          idRefund: "RFD-MOCK-303",
-          idTransaksi: "TIX-VIP12B",
-          alasan: "Salah membeli kategori tiket (ingin pindah ke Festival)",
-          jumlahRefund: 1200000,
-          statusRefund: "APPROVED",
-          namaPengunjung: "Rian Hidayat",
-          tanggalAjuan: "2026-05-30"
-        }
-      ];
-      setRefunds(defaultClaims);
-      localStorage.setItem("tixevent_refunds", JSON.stringify(defaultClaims));
-      
-      // Calculate and store initial approved refunds total
-      const initialApprovedTotal = defaultClaims
-        .filter((r) => r.statusRefund === "APPROVED")
-        .reduce((sum, r) => sum + r.jumlahRefund, 0);
-      localStorage.setItem("tixevent_refund_total", initialApprovedTotal.toString());
-    }
+    fetchRefunds();
   }, []);
 
-  const handleProcessRefund = (idRefund: string, statusBaru: "APPROVED" | "REJECTED") => {
-    const updated = refunds.map((r) => {
-      if (r.idRefund === idRefund) {
-        return {
-          ...r,
-          statusRefund: statusBaru
-        };
+  const handleProcessRefund = async (idRefund: string, statusBaru: "APPROVED" | "REJECTED") => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/refund/proses/${idRefund}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ statusRefund: statusBaru })
+      });
+
+      if (!response.ok) {
+        throw new Error("Gagal memproses pengajuan refund dari server.");
       }
-      return r;
-    });
 
-    setRefunds(updated);
-    localStorage.setItem("tixevent_refunds", JSON.stringify(updated));
+      // Backend membalikkan String text biasa, bukan JSON (berdasarkan RefundRestController)
+      const actionWord = statusBaru === "APPROVED" ? "disetujui" : "ditolak";
+      setSuccess(`Pengajuan refund ${idRefund} berhasil ${actionWord}!`);
+      
+      // Refresh tabel otomatis
+      fetchRefunds();
 
-    // Calculate new total approved refunds and save for Keuangan page
-    const totalApproved = updated
-      .filter((r) => r.statusRefund === "APPROVED")
-      .reduce((sum, r) => sum + r.jumlahRefund, 0);
-    localStorage.setItem("tixevent_refund_total", totalApproved.toString());
-
-    const targetRefund = refunds.find((r) => r.idRefund === idRefund);
-    const actionWord = statusBaru === "APPROVED" ? "disetujui" : "ditolak";
-    setSuccess(`Pengajuan refund ${targetRefund?.idRefund} (${targetRefund?.namaPengunjung}) berhasil ${actionWord}!`);
-
-    // Clear alert after 3 seconds
-    setTimeout(() => {
-      setSuccess("");
-    }, 3000);
+      // Clear alert after 3 seconds
+      setTimeout(() => {
+        setSuccess("");
+      }, 3000);
+    } catch (err: any) {
+      setError(err.message);
+      setTimeout(() => setError(""), 3000);
+    }
   };
 
   const formatCurrency = (val: number) => {
@@ -101,6 +80,12 @@ export default function RefundApproval() {
       {success && (
         <div className="mb-5 py-3 px-4 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-600 text-xs font-semibold transition-all duration-300">
           ✅ {success}
+        </div>
+      )}
+
+      {error && (
+        <div className="mb-5 py-3 px-4 rounded-lg bg-red-50 border border-red-200 text-red-650 text-xs font-semibold">
+          ❌ {error}
         </div>
       )}
 

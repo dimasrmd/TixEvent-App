@@ -32,114 +32,106 @@ export default function RundownScheduling() {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
+  const fetchAllData = async () => {
+    try {
+      const [eventsRes, artistsRes, schedulesRes] = await Promise.all([
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/rundown/events`),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/rundown/artists`),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/rundown`)
+      ]);
+
+      if (eventsRes.ok) {
+        const eventsData = await eventsRes.json();
+        setEvents(eventsData);
+        if (eventsData.length > 0) setSelectedEventId(eventsData[0].idEvent);
+      }
+      if (artistsRes.ok) {
+        const artistsData = await artistsRes.json();
+        setArtists(artistsData);
+        if (artistsData.length > 0) setSelectedArtistId(artistsData[0].idArtist);
+      }
+      if (schedulesRes.ok) {
+        const schedulesData = await schedulesRes.json();
+        const formatted = schedulesData.map((s: any) => ({
+          idJadwal: s.idJadwal,
+          panggung: s.panggung,
+          startTime: s.startTime,
+          endTime: s.endTime,
+          eventId: s.event?.idEvent || "",
+          eventName: s.event?.eventName || "Event",
+          artistId: "",
+          artistName: s.event?.eventName || "Penampil"
+        }));
+        setSchedules(formatted);
+      }
+    } catch (err) {
+      console.error("Gagal memuat data rundown", err);
+    }
+  };
+
   useEffect(() => {
-    // 1. Initialize or load Events
-    const savedEvents = localStorage.getItem("tixevent_events");
-    if (savedEvents) {
-      const parsed = JSON.parse(savedEvents);
-      setEvents(parsed);
-      if (parsed.length > 0) setSelectedEventId(parsed[0].idEvent);
-    } else {
-      const defaultEvents: EventItem[] = [
-        { idEvent: "EVT-MOCK-01", eventName: "Neon Rhythm Festival 2026", stageName: "Main Stage", location: "Arena Barat" }
-      ];
-      setEvents(defaultEvents);
-      setSelectedEventId(defaultEvents[0].idEvent);
-      localStorage.setItem("tixevent_events", JSON.stringify(defaultEvents));
-    }
-
-    // 2. Initialize or load Artists
-    const savedArtists = localStorage.getItem("tixevent_artists");
-    if (savedArtists) {
-      const parsed = JSON.parse(savedArtists);
-      setArtists(parsed);
-      if (parsed.length > 0) setSelectedArtistId(parsed[0].idArtist);
-    } else {
-      const defaultArtists: ArtistItem[] = [
-        { idArtist: "ART-MOCK-01", name: "Cyber Pulse DJ", genre: "Electronic" },
-        { idArtist: "ART-MOCK-02", name: "The Rock Anthems", genre: "Rock" },
-        { idArtist: "ART-MOCK-03", name: "Synth Wave Trio", genre: "Indie Pop" }
-      ];
-      setArtists(defaultArtists);
-      setSelectedArtistId(defaultArtists[0].idArtist);
-      localStorage.setItem("tixevent_artists", JSON.stringify(defaultArtists));
-    }
-
-    // 3. Initialize or load Schedules
-    const savedSchedules = localStorage.getItem("tixevent_schedules");
-    if (savedSchedules) {
-      setSchedules(JSON.parse(savedSchedules));
-    } else {
-      const defaultSchedules: EventSchedule[] = [
-        {
-          idJadwal: "SCH-MOCK-701",
-          panggung: "Main Stage",
-          startTime: "2026-06-02T19:00",
-          endTime: "2026-06-02T20:30",
-          eventId: "EVT-MOCK-01",
-          eventName: "Neon Rhythm Festival 2026",
-          artistId: "ART-MOCK-01",
-          artistName: "Cyber Pulse DJ"
-        },
-        {
-          idJadwal: "SCH-MOCK-702",
-          panggung: "Cyber Stage",
-          startTime: "2026-06-02T20:00",
-          endTime: "2026-06-02T21:30",
-          eventId: "EVT-MOCK-01",
-          eventName: "Neon Rhythm Festival 2026",
-          artistId: "ART-MOCK-03",
-          artistName: "Synth Wave Trio"
-        }
-      ];
-      setSchedules(defaultSchedules);
-      localStorage.setItem("tixevent_schedules", JSON.stringify(defaultSchedules));
-    }
+    fetchAllData();
   }, []);
 
-  const handleAddEvent = (e: React.FormEvent) => {
+  const handleAddEvent = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newEventName) return;
 
-    const newEvt: EventItem = {
-      idEvent: "EVT-MOCK-" + Math.floor(100 + Math.random() * 900),
-      eventName: newEventName,
-      stageName: newStageName,
-      location: newLocation
-    };
-
-    const updated = [...events, newEvt];
-    setEvents(updated);
-    localStorage.setItem("tixevent_events", JSON.stringify(updated));
-    setSelectedEventId(newEvt.idEvent);
-    setNewEventName("");
-    setSuccess(`Event "${newEvt.eventName}" berhasil ditambahkan!`);
-    setTimeout(() => setSuccess(""), 3000);
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/rundown/events`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          eventName: newEventName,
+          stageName: newStageName,
+          location: newLocation
+        })
+      });
+      if (!response.ok) throw new Error("Gagal menambah event");
+      const data = await response.json();
+      
+      setEvents([...events, data]);
+      setSelectedEventId(data.idEvent);
+      setNewEventName("");
+      setSuccess(`Event "${data.eventName}" berhasil ditambahkan!`);
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (err: any) {
+      setError(err.message);
+      setTimeout(() => setError(""), 3000);
+    }
   };
 
-  const handleAddArtist = (e: React.FormEvent) => {
+  const handleAddArtist = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newArtistName) return;
 
-    const newArt: ArtistItem = {
-      idArtist: "ART-MOCK-" + Math.floor(100 + Math.random() * 900),
-      name: newArtistName,
-      genre: newArtistGenre || "Umum"
-    };
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/rundown/artists`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: newArtistName,
+          genre: newArtistGenre || "Umum"
+        })
+      });
+      if (!response.ok) throw new Error("Gagal menambah artis");
+      const data = await response.json();
 
-    const updated = [...artists, newArt];
-    setArtists(updated);
-    localStorage.setItem("tixevent_artists", JSON.stringify(updated));
-    setSelectedArtistId(newArt.idArtist);
-    setNewArtistName("");
-    setNewArtistGenre("");
-    setSuccess(`Artis "${newArt.name}" berhasil didaftarkan!`);
-    setTimeout(() => setSuccess(""), 3000);
+      setArtists([...artists, data]);
+      setSelectedArtistId(data.idArtist);
+      setNewArtistName("");
+      setNewArtistGenre("");
+      setSuccess(`Artis "${data.name}" berhasil didaftarkan!`);
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (err: any) {
+      setError(err.message);
+      setTimeout(() => setError(""), 3000);
+    }
   };
 
-  const handleAddSchedule = (e: React.FormEvent) => {
+  const handleAddSchedule = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedEventId || !selectedArtistId || !schedulePanggung || !scheduleStart || !scheduleEnd) {
+    if (!selectedEventId || !schedulePanggung || !scheduleStart || !scheduleEnd) {
       setError("Semua isian jadwal rundown wajib diisi!");
       return;
     }
@@ -148,67 +140,52 @@ export default function RundownScheduling() {
     setError("");
     setSuccess("");
 
-    setTimeout(() => {
-      // 1. Conflict Check: Same Stage overlapping time slot!
-      const startMs = new Date(scheduleStart).getTime();
-      const endMs = new Date(scheduleEnd).getTime();
-
-      if (startMs >= endMs) {
-        setError("Gagal! Waktu Mulai tidak boleh setelah atau sama dengan Waktu Selesai!");
-        setLoading(false);
-        return;
-      }
-
-      // Check conflict inside schedules array
-      const hasConflict = schedules.some((s) => {
-        if (s.panggung.toLowerCase() !== schedulePanggung.toLowerCase()) return false;
-
-        const existingStartMs = new Date(s.startTime).getTime();
-        const existingEndMs = new Date(s.endTime).getTime();
-
-        // Check overlap: (StartA < EndB) AND (EndA > StartB)
-        return startMs < existingEndMs && endMs > existingStartMs;
+    try {
+      const eventObj = events.find((evt) => evt.idEvent === selectedEventId);
+      
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/rundown`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          panggung: schedulePanggung,
+          startTime: scheduleStart,
+          endTime: scheduleEnd,
+          event: eventObj
+        })
       });
 
-      if (hasConflict) {
-        // Trigger simulated 400 Bad Request conflict exception
-        setError("Gagal (400 Bad Request): Jadwal bentrok pada panggung yang sama!");
-        setLoading(false);
-        return;
+      const data = await response.json();
+
+      if (!response.ok || data.status === "Failed") {
+        throw new Error(data.message || "Jadwal bentrok pada panggung yang sama!");
       }
 
-      // 2. No conflict: Save Schedule!
-      const eventObj = events.find((e) => e.idEvent === selectedEventId);
-      const artistObj = artists.find((a) => a.idArtist === selectedArtistId);
-
-      const newSchedule: EventSchedule = {
-        idJadwal: "SCH-MOCK-" + Math.floor(100 + Math.random() * 900),
-        panggung: schedulePanggung,
-        startTime: scheduleStart,
-        endTime: scheduleEnd,
-        eventId: selectedEventId,
-        eventName: eventObj ? eventObj.eventName : "Event Acara",
-        artistId: selectedArtistId,
-        artistName: artistObj ? artistObj.name : "Artis Musisi"
-      };
-
-      const updated = [newSchedule, ...schedules];
-      setSchedules(updated);
-      localStorage.setItem("tixevent_schedules", JSON.stringify(updated));
-
-      setSuccess(`Berhasil menjadwalkan "${artistObj?.name}" pada panggung ${schedulePanggung}!`);
+      setSuccess(`Berhasil menjadwalkan pada panggung ${schedulePanggung}!`);
       setScheduleStart("");
       setScheduleEnd("");
+      
+      // refresh schedules
+      fetchAllData();
+    } catch (err: any) {
+      setError("Gagal (400 Bad Request): " + err.message);
+    } finally {
       setLoading(false);
-    }, 700);
+    }
   };
 
-  const handleDeleteSchedule = (id: string) => {
-    const updated = schedules.filter((s) => s.idJadwal !== id);
-    setSchedules(updated);
-    localStorage.setItem("tixevent_schedules", JSON.stringify(updated));
-    setSuccess("Jadwal rundown berhasil dihapus.");
-    setTimeout(() => setSuccess(""), 3000);
+  const handleDeleteSchedule = async (id: string) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/rundown/${id}`, {
+        method: "DELETE"
+      });
+      if (response.ok) {
+        setSchedules(schedules.filter((s) => s.idJadwal !== id));
+        setSuccess("Jadwal rundown berhasil dihapus.");
+        setTimeout(() => setSuccess(""), 3000);
+      }
+    } catch (err) {
+      console.error("Gagal menghapus jadwal", err);
+    }
   };
 
   const formatDateTime = (isoStr: string) => {

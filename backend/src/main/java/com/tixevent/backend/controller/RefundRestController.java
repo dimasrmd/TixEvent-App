@@ -45,9 +45,6 @@ public class RefundRestController {
             String idTransaksi = (String) request.get("idTransaksi");
             String alasan = (String) request.get("alasan");
 
-            // Konversi nilai angka yang masuk agar selalu aman menjadi double
-            double jumlahRefund = Double.parseDouble(request.get("jumlahRefund").toString());
-
             // Validasi data kosong
             if (idTransaksi == null || alasan == null) {
                 return ResponseEntity.badRequest().body(Map.of(
@@ -56,8 +53,8 @@ public class RefundRestController {
                 ));
             }
 
-            // Panggil logika service
-            String result = refundService.ajukanRefund(idTransaksi, alasan, jumlahRefund);
+            // Panggil logika service, tidak perlu jumlahRefund karena otomatis narik dari total bayar transaksi
+            String result = refundService.ajukanRefund(idTransaksi, alasan);
 
             // Balikan (Response)
             if (result.startsWith("Berhasil")) {
@@ -71,12 +68,6 @@ public class RefundRestController {
                         "message", result
                 ));
             }
-        } catch (NumberFormatException e) {
-            // Ini khusus menangkap error jika angka salah format
-            return ResponseEntity.badRequest().body(Map.of(
-                    "status", "Failed",
-                    "message", "Format data salah. Pastikan jumlahRefund berupa angka."
-            ));
         } catch (Exception e) {
             // Ini menangkap error lainnya (seperti database conflict)
             e.printStackTrace(); // Tampilkan error aslinya di terminal merah IntelliJ

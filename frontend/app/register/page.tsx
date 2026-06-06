@@ -17,7 +17,7 @@ export default function VisitorRegister() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!nama || !email || !noHp || !password) {
       setError("Semua kolom isian wajib diisi!");
@@ -28,30 +28,36 @@ export default function VisitorRegister() {
     setError("");
     setSuccess("");
 
-    // Simulate instant client-side frontend registration
-    setTimeout(() => {
-      setSuccess("Mock Registrasi Pengunjung Sukses & Auto-Login Aktif!");
-      const uppercaseName = nama.toUpperCase() || "VISITOR";
-      
-      // Save data for client-side use (Auto Login!)
-      localStorage.setItem("role", "pengunjung");
-      localStorage.setItem("idUser", "USR-MOCK-VISITOR");
-      localStorage.setItem("nama", uppercaseName);
-      
-      // Save to cookies for middleware route guard checks
-      setCookie("role", "pengunjung", 86400);
-      setCookie("idUser", "USR-MOCK-VISITOR", 86400);
-      setCookie("nama", uppercaseName, 86400);
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/pengunjung/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ nama, email, noHp, password }),
+      });
 
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Registrasi gagal!");
+      }
+
+      setSuccess(data.message || "Registrasi Pengunjung Sukses! Silakan login.");
+      
       setNama("");
       setEmail("");
       setNoHp("");
       setPassword("");
       
       setTimeout(() => {
-        window.location.href = "/pengunjung/tiket";
-      }, 1000);
-    }, 500);
+        window.location.href = "/login";
+      }, 1500);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

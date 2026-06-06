@@ -7,45 +7,30 @@ export default function TenantManagement() {
   const [tenants, setTenants] = useState<TenantPartner[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("tixevent_manager_tenants");
-    if (saved) {
-      setTenants(JSON.parse(saved));
-    } else {
-      const defaultTenants: TenantPartner[] = [
-        {
-          idTenant: "TNT-MOCK-201",
-          namaBrand: "Gourmet Seafood & Grill",
-          email: "seafood.grill@mitra.com",
-          noHp: "081122334455",
-          nomorBooth: "A01",
-          lokasiBooth: "Food Court Utara",
-          kategoriUsaha: "Makanan Berat",
-          statusSewa: "TERVERIFIKASI"
-        },
-        {
-          idTenant: "TNT-MOCK-202",
-          namaBrand: "Nitro Brew Coffee & Pastry",
-          email: "nitro.brew@mitra.com",
-          noHp: "085544332211",
-          nomorBooth: "A02",
-          lokasiBooth: "Food Court Selatan",
-          kategoriUsaha: "Minuman & Dessert",
-          statusSewa: "TERVERIFIKASI"
-        },
-        {
-          idTenant: "TNT-MOCK-203",
-          namaBrand: "Rhythm Merch Official",
-          email: "rhythm.merch@mitra.com",
-          noHp: "089900112233",
-          nomorBooth: "B03",
-          lokasiBooth: "Merchandise Alley",
-          kategoriUsaha: "Aksesoris & Baju",
-          statusSewa: "TERVERIFIKASI"
+    const fetchTenants = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tenant`);
+        if (response.ok) {
+          const data = await response.json();
+          // Pemetaan data disesuaikan dengan format entity TenantBackend
+          const mappedTenants = data.map((t: any) => ({
+            idTenant: t.idUser,
+            namaBrand: t.namaUsaha || t.nama,
+            email: t.email,
+            noHp: t.noHp,
+            nomorBooth: t.nomorBooth || "Belum ada",
+            lokasiBooth: t.lokasiBooth || "Belum ada",
+            kategoriUsaha: t.kategoriUsaha || "General",
+            statusSewa: t.statusSewa || "TERVERIFIKASI"
+          }));
+          setTenants(mappedTenants);
         }
-      ];
-      setTenants(defaultTenants);
-      localStorage.setItem("tixevent_manager_tenants", JSON.stringify(defaultTenants));
-    }
+      } catch (err) {
+        console.error("Gagal memuat daftar mitra tenant:", err);
+      }
+    };
+    
+    fetchTenants();
   }, []);
 
   return (

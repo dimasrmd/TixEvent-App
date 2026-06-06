@@ -45,24 +45,44 @@ public class RefundService {
         return "Gagal: Refund dengan ID " + idRefund + " tidak ditemukan.";
     }
 
-    public String ajukanRefund(String idTransaksi, String alasan, double jumlahRefund) {
+    public String ajukanRefund(String idTransaksi, String alasan) {
         // 1. Validasi apakah transaksi aslinya ada di database
         Optional<Transaksi> trxOpt = transaksiRepository.findById(idTransaksi);
         if (trxOpt.isEmpty()) {
             return "Gagal: Transaksi dengan ID " + idTransaksi + " tidak ditemukan!";
         }
 
-        // 2. Buat objek Refund baru
+        Transaksi trx = trxOpt.get();
+
+        // 2. Cek apakah refund untuk transaksi ini sudah ada
+        Optional<Refund> existingRefund = refundRepository.findByTransaksi(trx);
+        if (existingRefund.isPresent()) {
+            Refund r = existingRefund.get();
+            if (r.getStatusRefund().equals("PENDING")) {
+                return "Gagal: Pengajuan refund untuk transaksi ini sedang diproses.";
+            } else if (r.getStatusRefund().equals("APPROVED")) {
+                return "Gagal: Pengajuan refund untuk transaksi ini sudah disetujui sebelumnya.";
+            } else if (r.getStatusRefund().equals("REJECTED")) {
+                // Update existing refund instead of creating a new one
+                r.setStatusRefund("PENDING");
+                r.setAlasan(alasan);
+                // jumlahRefund tetap sama
+                refundRepository.save(r);
+                return "Berhasil: Pengajuan ulang refund (yang sebelumnya ditolak) telah dikirim.";
+            }
+        }
+
+        // 3. Buat objek Refund baru jika belum ada
         Refund pengajuanBaru = new Refund();
         String generatedId = "RFD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
         pengajuanBaru.setIdRefund(generatedId);
         pengajuanBaru.setAlasan(alasan);
-        pengajuanBaru.setJumlahRefund(jumlahRefund);
+        pengajuanBaru.setJumlahRefund(trx.getTotalBayar()); // Mengacu ke totalBayar otomatis
         pengajuanBaru.setStatusRefund("PENDING"); // Status default sesuai sistem
-        pengajuanBaru.setTransaksi(trxOpt.get()); // Hubungkan dengan transaksi asli
+        pengajuanBaru.setTransaksi(trx); // Hubungkan dengan transaksi asli
 
-        // 3. Simpan ke database
+        // 4. Simpan ke database
         refundRepository.save(pengajuanBaru);
         return "Berhasil: Pengajuan refund berhasil dikirim dengan ID " + generatedId;
     }

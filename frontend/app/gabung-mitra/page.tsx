@@ -16,7 +16,7 @@ export default function PartnerRegister() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!nama || !email || !noHp || !password) {
       setError("Semua kolom isian wajib diisi!");
@@ -27,9 +27,23 @@ export default function PartnerRegister() {
     setError("");
     setSuccess("");
 
-    // Simulate instant client-side tenant registration
-    setTimeout(() => {
-      setSuccess("Pendaftaran Mitra Berhasil! Mengalihkan ke Halaman Login Tenant...");
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/tenant/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ nama, email, noHp, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Registrasi Mitra gagal!");
+      }
+
+      setSuccess(data.message || "Pendaftaran Mitra Berhasil! Mengalihkan ke Halaman Login Tenant...");
+      
       setNama("");
       setEmail("");
       setNoHp("");
@@ -38,7 +52,11 @@ export default function PartnerRegister() {
       setTimeout(() => {
         window.location.href = "/mitra/login";
       }, 1500);
-    }, 500);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

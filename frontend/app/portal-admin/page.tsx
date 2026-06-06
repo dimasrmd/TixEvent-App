@@ -16,7 +16,7 @@ export default function AdminPortalLogin() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password || !role) {
       setError("Semua kolom isian wajib diisi!");
@@ -27,21 +27,31 @@ export default function AdminPortalLogin() {
     setError("");
     setSuccess("");
 
-    // Simulate instant client-side frontend admin portal authentication
-    setTimeout(() => {
-      const roleNameFormatted = role.charAt(0).toUpperCase() + role.slice(1);
-      setSuccess(`Login Staf (${roleNameFormatted}) Sukses (Frontend Simulation)!`);
-      const fullname = `Lutfi ${roleNameFormatted}`;
+    try {
+      const apiRole = role === "kru" ? "kru" : role === "panitia" ? "panitia" : "manajer";
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/${apiRole}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Login gagal!");
+      }
+
+      setSuccess(data.message || `Login Staf Sukses!`);
       
-      // Save data for client-side use
-      localStorage.setItem("role", role);
-      localStorage.setItem("idUser", "STF-MOCK-ID");
-      localStorage.setItem("nama", fullname);
+      localStorage.setItem("role", data.role.toLowerCase());
+      localStorage.setItem("idUser", data.idUser);
+      localStorage.setItem("nama", data.nama);
       
-      // Save to cookies for middleware route guard checks
-      setCookie("role", role, 86400);
-      setCookie("idUser", "STF-MOCK-ID", 86400);
-      setCookie("nama", fullname, 86400);
+      setCookie("role", data.role.toLowerCase(), 86400);
+      setCookie("idUser", data.idUser, 86400);
+      setCookie("nama", data.nama, 86400);
 
       setTimeout(() => {
         if (role === "manajer") {
@@ -52,7 +62,11 @@ export default function AdminPortalLogin() {
           window.location.href = "/crew/absensi";
         }
       }, 1000);
-    }, 500);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

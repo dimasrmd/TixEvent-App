@@ -13,7 +13,7 @@ export default function VisitorRefund() {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
-  const handleRefund = (e: React.FormEvent) => {
+  const handleRefund = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!ticketCode || !alasan) {
       setError("Kolom Kode Tiket dan Alasan wajib diisi!");
@@ -24,12 +24,32 @@ export default function VisitorRefund() {
     setError("");
     setSuccess("");
 
-    setTimeout(() => {
-      setSuccess("Pengajuan refund berhasil dikirimkan! Manajer akan meninjau pengajuan Anda segera.");
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/refund/ajukan`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          idTransaksi: ticketCode, 
+          alasan: alasan
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || data.status === "Failed") {
+        throw new Error(data.message || "Gagal mengajukan refund!");
+      }
+
+      setSuccess(data.message || "Pengajuan refund berhasil dikirimkan!");
       setTicketCode("");
       setAlasan("");
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
       setLoading(false);
-    }, 600);
+    }
   };
 
   return (

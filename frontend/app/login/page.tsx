@@ -14,7 +14,7 @@ export default function VisitorLogin() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
       setError("Email dan Password wajib diisi!");
@@ -25,25 +25,41 @@ export default function VisitorLogin() {
     setError("");
     setSuccess("");
 
-    // Simulate instant client-side frontend authentication
-    setTimeout(() => {
-      setSuccess("Login Pengunjung Sukses (Frontend Simulation)!");
-      const username = email.split("@")[0].toUpperCase();
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/pengunjung/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Login gagal! Silakan periksa kembali email dan password Anda.");
+      }
+
+      setSuccess(data.message || "Login Pengunjung Sukses!");
       
-      // Save data for client-side use
-      localStorage.setItem("role", "pengunjung");
-      localStorage.setItem("idUser", "USR-MOCK-VISITOR");
-      localStorage.setItem("nama", username);
+      // Save data from backend
+      localStorage.setItem("role", data.role.toLowerCase());
+      localStorage.setItem("idUser", data.idUser);
+      localStorage.setItem("nama", data.nama);
       
       // Save to cookies for middleware route guard checks
-      setCookie("role", "pengunjung", 86400);
-      setCookie("idUser", "USR-MOCK-VISITOR", 86400);
-      setCookie("nama", username, 86400);
+      setCookie("role", data.role.toLowerCase(), 86400);
+      setCookie("idUser", data.idUser, 86400);
+      setCookie("nama", data.nama, 86400);
 
       setTimeout(() => {
         window.location.href = "/pengunjung/tiket";
       }, 1000);
-    }, 500);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
