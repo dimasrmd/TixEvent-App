@@ -1,6 +1,7 @@
 package com.tixevent.backend.controller;
 
 import com.tixevent.backend.entity.Crew;
+import com.tixevent.backend.entity.Panitia;
 import com.tixevent.backend.entity.ShiftLog;
 import com.tixevent.backend.service.CrewService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,12 @@ public class CrewRestController {
     @GetMapping("/shifts")
     public ResponseEntity<List<ShiftLog>> getAllShifts() {
         return ResponseEntity.ok(crewService.getAllShifts());
+    }
+
+    // Endpoint untuk mendapatkan seluruh data Panitia (GET)
+    @GetMapping("/panitia")
+    public ResponseEntity<List<Panitia>> getAllPanitia() {
+        return ResponseEntity.ok(crewService.getAllPanitia());
     }
 
     // Endpoint untuk mendapatkan seluruh data Crew (GET)

@@ -1,8 +1,10 @@
 package com.tixevent.backend.service;
 
 import com.tixevent.backend.entity.Crew;
+import com.tixevent.backend.entity.Panitia;
 import com.tixevent.backend.entity.ShiftLog;
 import com.tixevent.backend.repository.CrewRepository;
+import com.tixevent.backend.repository.PanitiaRepository;
 import com.tixevent.backend.repository.ShiftLogRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +19,18 @@ public class CrewService {
 
     private final CrewRepository crewRepository;
     private final ShiftLogRepository shiftLogRepository;
+    private final PanitiaRepository panitiaRepository;
 
     @Autowired
-    public CrewService(CrewRepository crewRepository, ShiftLogRepository shiftLogRepository) {
+    public CrewService(CrewRepository crewRepository, ShiftLogRepository shiftLogRepository, PanitiaRepository panitiaRepository) {
         this.crewRepository = crewRepository;
         this.shiftLogRepository = shiftLogRepository;
+        this.panitiaRepository = panitiaRepository;
+    }
+
+    // Mendapatkan seluruh daftar Panitia dari database
+    public List<Panitia> getAllPanitia() {
+        return panitiaRepository.findAll();
     }
 
     // Mendapatkan seluruh daftar Crew dari database
