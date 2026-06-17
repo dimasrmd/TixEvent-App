@@ -14,7 +14,7 @@ export default function TenantLogin() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
       setError("Email dan Password wajib diisi!");
@@ -25,24 +25,42 @@ export default function TenantLogin() {
     setError("");
     setSuccess("");
 
-    // Simulate instant client-side frontend tenant authentication
-    setTimeout(() => {
-      setSuccess("Login Tenant Sukses (Frontend Simulation)!");
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/tenant/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Login gagal! Silakan periksa kembali email dan password Anda.");
+      }
+
+      setSuccess(data.message || "Login Tenant Sukses!");
       
-      // Save data for client-side use
-      localStorage.setItem("role", "tenant");
-      localStorage.setItem("idUser", "TNT-MOCK-ID");
-      localStorage.setItem("nama", "Tenant Seafood");
+      // Save data from backend
+      const finalRole = (data.role || "tenant").toLowerCase();
+      localStorage.setItem("role", finalRole);
+      localStorage.setItem("idUser", data.idUser);
+      localStorage.setItem("nama", data.nama);
       
       // Save to cookies for middleware route guard checks
-      setCookie("role", "tenant", 86400);
-      setCookie("idUser", "TNT-MOCK-ID", 86400);
-      setCookie("nama", "Tenant Seafood", 86400);
+      setCookie("role", finalRole, 86400);
+      setCookie("idUser", data.idUser, 86400);
+      setCookie("nama", data.nama, 86400);
 
       setTimeout(() => {
         window.location.href = "/tenant/booth";
       }, 1000);
-    }, 500);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -94,7 +112,13 @@ export default function TenantLogin() {
           </Button>
         </form>
 
-        <div className="mt-6 text-center">
+        <div className="mt-6 text-center flex flex-col gap-3">
+          <p className="text-xs text-zinc-500 m-0">
+            Belum punya akun tenant?{" "}
+            <Link href="/gabung-mitra" className="text-emerald-600 font-semibold no-underline hover:underline">
+              Registrasi
+            </Link>
+          </p>
           <Link href="/" className="text-zinc-500 font-semibold no-underline hover:underline text-xs">
             Kembali ke Beranda
           </Link>

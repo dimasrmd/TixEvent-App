@@ -25,56 +25,49 @@ export default function ShiftScheduling() {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    // 1. Fetch active crews from staff list in LocalStorage
-    const savedStaf = localStorage.getItem("tixevent_staf");
-    if (savedStaf) {
-      const parsed = JSON.parse(savedStaf);
-      const filteredCrews = parsed.filter((s: any) => s.role === "KRU");
-      setCrews(filteredCrews);
-      if (filteredCrews.length > 0) setIdCrew(filteredCrews[0].idUser);
-    } else {
-      const defaultCrews = [
-        { idUser: "STF-MOCK-001", nama: "Lutfi Hakim", role: "KRU" },
-        { idUser: "STF-MOCK-003", nama: "Andi Saputra", role: "KRU" }
-      ];
-      setCrews(defaultCrews);
-      if (defaultCrews.length > 0) setIdCrew(defaultCrews[0].idUser);
+  const fetchCrews = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/kru/crews`);
+      if (response.ok) {
+        const data = await response.json();
+        // API Kru Crews sudah terjamin hanya mengembalikan kru, tidak perlu difilter string "KRU"
+        setCrews(data);
+        if (data.length > 0) setIdCrew(data[0].idUser || data[0].id);
+      }
+    } catch (err) {
+      console.error("Gagal memuat kru aktif:", err);
     }
+  };
 
-    // 2. Fetch or initialize shifts list
-    const savedShifts = localStorage.getItem("tixevent_shifts");
-    if (savedShifts) {
-      setShifts(JSON.parse(savedShifts));
-    } else {
-      const defaultShifts: ShiftLog[] = [
-        {
-          idShift: "SHF-MOCK-101",
-          idCrew: "STF-MOCK-001",
-          crewName: "Lutfi Hakim",
-          tanggal: "2026-06-02",
-          jamMulai: "08:00",
-          jamSelesai: "16:00",
-          posTugas: "Gate A Utama",
-          statusHadir: "PENDING"
-        },
-        {
-          idShift: "SHF-MOCK-102",
-          idCrew: "STF-MOCK-003",
-          crewName: "Andi Saputra",
-          tanggal: "2026-06-02",
-          jamMulai: "16:00",
-          jamSelesai: "23:59",
-          posTugas: "Keamanan Barikade",
-          statusHadir: "PENDING"
-        }
-      ];
-      setShifts(defaultShifts);
-      localStorage.setItem("tixevent_shifts", JSON.stringify(defaultShifts));
+  const fetchShifts = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/kru/shifts`);
+      if (response.ok) {
+        const data = await response.json();
+        // Pemetaan dari entity backend ke UI
+        const mappedShifts = data.map((s: any) => ({
+          idShift: s.idShift || s.id,
+          idCrew: s.crew?.idUser || s.crew?.id || "N/A",
+          crewName: s.crew?.nama || "Unknown Crew",
+          tanggal: s.tanggal,
+          jamMulai: s.jamMulai,
+          jamSelesai: s.jamSelesai,
+          posTugas: s.posTugas,
+          statusHadir: s.statusHadir || "PENDING"
+        }));
+        setShifts(mappedShifts);
+      }
+    } catch (err) {
+      console.error("Gagal memuat jadwal shift:", err);
     }
+  };
+
+  useEffect(() => {
+    fetchCrews();
+    fetchShifts();
   }, []);
 
-  const handleSaveShift = (e: React.FormEvent) => {
+  const handleSaveShift = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!idCrew || !tanggal || !jamMulai || !jamSelesai || !posTugas) {
       setError("Semua kolom isian wajib diisi!");
@@ -85,51 +78,55 @@ export default function ShiftScheduling() {
     setError("");
     setSuccess("");
 
-    setTimeout(() => {
-      const selectedCrewObj = crews.find((c) => c.idUser === idCrew);
+    try {
+      const selectedCrewObj = crews.find((c: any) => (c.idUser || c.id) === idCrew);
       const crewName = selectedCrewObj ? selectedCrewObj.nama : "Kru Lapangan";
 
+      // Sesuaikan object yang dikirim dengan requirement backend
+      const payload = {
+        idCrew,
+        tanggal,
+        jamMulai,
+        jamSelesai,
+        posTugas
+      };
+
       if (editingShiftId) {
-        // Edit Shift (PUT simulation)
-        const updated = shifts.map((s) => {
-          if (s.idShift === editingShiftId) {
-            return {
-              ...s,
-              tanggal,
-              jamMulai,
-              jamSelesai,
-              posTugas
-            };
-          }
-          return s;
+        // Edit Shift via PUT
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/kru/shifts/${editingShiftId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
         });
-        setShifts(updated);
-        localStorage.setItem("tixevent_shifts", JSON.stringify(updated));
+
+        if (!response.ok) throw new Error("Gagal mengupdate jadwal shift");
+        
         setSuccess("Jadwal shift berhasil dirombak / diperbarui!");
         setEditingShiftId(null);
       } else {
-        // Add Shift (POST simulation)
-        const newShift: ShiftLog = {
-          idShift: "SHF-MOCK-" + Math.floor(100 + Math.random() * 900),
-          idCrew,
-          crewName,
-          tanggal,
-          jamMulai,
-          jamSelesai,
-          posTugas,
-          statusHadir: "PENDING"
-        };
-        const updated = [newShift, ...shifts];
-        setShifts(updated);
-        localStorage.setItem("tixevent_shifts", JSON.stringify(updated));
+        // Add Shift via POST
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/kru/shifts`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) throw new Error("Gagal mendaftarkan jadwal shift baru");
+        
         setSuccess(`Jadwal shift baru berhasil ditambahkan untuk ${crewName}!`);
       }
+
+      // Refresh tabel shift dari database
+      fetchShifts();
 
       // Reset form fields
       setTanggal("");
       setPosTugas("");
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
       setLoading(false);
-    }, 600);
+    }
   };
 
   const handleLoadEdit = (shift: ShiftLog) => {

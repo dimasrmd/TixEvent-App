@@ -58,54 +58,52 @@ export default function TicketCheckIn() {
     setLoading(true);
     setStatusMessage({ status: null, message: "" });
 
-    // Simulate backend POST to /api/checkin/validate
-    setTimeout(() => {
-      const cleanCode = kodeTiket.trim().toUpperCase();
-      const savedTickets = localStorage.getItem("tixevent_valid_tickets");
-      const validTickets = savedTickets ? JSON.parse(savedTickets) : [];
+    const validateAPI = async () => {
+      try {
+        const cleanCode = kodeTiket.trim().toUpperCase();
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/checkin/validate`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ kodeTiket: cleanCode }),
+        });
 
-      // Find the ticket index in our database
-      const ticketIndex = validTickets.findIndex((t: any) => t.kode === cleanCode);
+        const data = await response.json();
+        const isSuccess = response.ok;
+        const respMessage = data.message || (isSuccess ? "Check-in sukses!" : "Check-in gagal!");
 
-      let isSuccess = false;
-      let respMessage = "";
+        const timestamp = new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+        const newLog: CheckedInTicket = {
+          kodeTiket: cleanCode,
+          waktuCheckIn: timestamp,
+          status: isSuccess ? "SUCCESS" : "FAILED",
+          message: respMessage
+        };
 
-      if (ticketIndex === -1) {
-        // Not registered
-        respMessage = "Check-in gagal! Kode tiket salah atau tidak terdaftar di sistem.";
-      } else if (validTickets[ticketIndex].used) {
-        // Already used
-        respMessage = "Check-in gagal! Kode tiket sudah pernah digunakan untuk masuk.";
-      } else {
-        // Valid & unused -> check-in success!
-        isSuccess = true;
-        respMessage = `Check-in sukses! Tiket ${validTickets[ticketIndex].kategori} valid.`;
-        
-        // Mark as used
-        validTickets[ticketIndex].used = true;
-        localStorage.setItem("tixevent_valid_tickets", JSON.stringify(validTickets));
+        const updatedHistory = [newLog, ...checkInHistory];
+        setCheckInHistory(updatedHistory);
+        localStorage.setItem("tixevent_checkin_history", JSON.stringify(updatedHistory));
+
+        setStatusMessage({
+          status: isSuccess ? "Success" : "Failed",
+          message: respMessage
+        });
+
+        if (isSuccess) {
+          setKodeTiket("");
+        }
+      } catch (err: any) {
+        setStatusMessage({
+          status: "Failed",
+          message: "Kesalahan jaringan: Gagal terhubung ke server."
+        });
+      } finally {
+        setLoading(false);
       }
+    };
 
-      const timestamp = new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
-      const newLog: CheckedInTicket = {
-        kodeTiket: cleanCode,
-        waktuCheckIn: timestamp,
-        status: isSuccess ? "SUCCESS" : "FAILED",
-        message: respMessage
-      };
-
-      const updatedHistory = [newLog, ...checkInHistory];
-      setCheckInHistory(updatedHistory);
-      localStorage.setItem("tixevent_checkin_history", JSON.stringify(updatedHistory));
-
-      setStatusMessage({
-        status: isSuccess ? "Success" : "Failed",
-        message: respMessage
-      });
-
-      setKodeTiket("");
-      setLoading(false);
-    }, 600);
+    validateAPI();
   };
 
   const handleLogout = () => {

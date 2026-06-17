@@ -72,4 +72,8 @@ public class KeuanganService {
 
         return laporanRealTime;
     }
+
+    public List<Transaksi> getAllTransaksi() {
+        return transaksiRepository.findAll();
+    }
 }

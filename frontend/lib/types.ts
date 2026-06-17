@@ -11,7 +11,6 @@ export interface StaffMember {
   email: string;
   noHp: string;
   role: "KRU" | "PANITIA";
-  status: "AKTIF" | "CUTI";
 }
 
 export interface CrewMember {

@@ -13,16 +13,45 @@ export default function BuyTicket() {
   const [ticketCode, setTicketCode] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleBuy = (e: React.FormEvent) => {
+  const handleBuy = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    setTimeout(() => {
-      // Generate a random ticket code
-      const generatedCode = "TIX-" + Math.random().toString(36).substring(2, 8).toUpperCase();
-      setTicketCode(generatedCode);
+    try {
+      // Ambil idUser dari localStorage yang disimpan saat login
+      const idUser = localStorage.getItem("idUser");
+      
+      if (!idUser || idUser.includes("MOCK")) {
+        alert("Peringatan: Anda belum login dengan akun asli (masih menggunakan mock). Silakan login ulang untuk melanjutkan.");
+        setLoading(false);
+        return;
+      }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tiket/beli`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ idUser, kategori, jumlah }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || data.status === "Failed") {
+        alert(data.message || "Gagal memesan tiket.");
+        setLoading(false);
+        return;
+      }
+
+      // Tampilkan ID Transaksi / Kode Tiket yang digenerate backend
+      // Asumsi backend mengembalikan idTransaksi atau message
+      setTicketCode(data.idTransaksi || data.message || "SUKSES");
+      
+    } catch (err: any) {
+      alert("Terjadi kesalahan sistem: " + err.message);
+    } finally {
       setLoading(false);
-    }, 600);
+    }
   };
 
   return (

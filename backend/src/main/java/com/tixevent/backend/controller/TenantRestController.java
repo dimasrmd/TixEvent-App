@@ -32,13 +32,26 @@ public class TenantRestController {
         return tenantService.getAvailableBooth();
     }
 
+    // GET daftar booth tersewa beserta Tenant
+    @GetMapping("/booth-tersewa")
+    public List<BoothArea> getBoothTersewa() {
+        return tenantService.getBoothTersewa();
+    }
+
+    // POST tambah booth baru
+    @PostMapping("/booth-baru")
+    public BoothArea tambahBooth(@RequestBody BoothArea booth) {
+        return tenantService.tambahBooth(booth);
+    }
+
     // POST bayar sewa booth
     @PostMapping("/bayar")
     public String sewaBooth(@RequestBody Map<String, String> request) {
 
         String idBooth = request.get("idBooth");
+        String idTenant = request.get("idTenant");
 
-        return tenantService.sewaBooth(idBooth);
+        return tenantService.sewaBooth(idBooth, idTenant);
     }
 
     // POST tambah tenant baru

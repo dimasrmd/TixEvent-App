@@ -21,76 +21,75 @@ export default function CrewAttendance() {
     setCrewName(name);
     setCrewId(id);
 
-    // 2. Fetch shifts list from localStorage (which contains shifts scheduled by the Manager)
-    const savedShifts = localStorage.getItem("tixevent_shifts");
-    if (savedShifts) {
-      const parsedShifts = JSON.parse(savedShifts);
-      
-      // Filter shifts belonging to this specific crew member
-      // If we logged in as a mock user (e.g. "Lutfi Hakim" or "Andi Saputra"), match against crew ID
-      // If none matches (like a newly created user), we fall back or show shifts associated with their id
-      const filtered = parsedShifts.filter((s: ShiftLog) => {
-        // Match either by ID (e.g. STF-MOCK-001) or by name
-        return s.idCrew === id || s.crewName.toLowerCase() === name.toLowerCase();
-      });
+    const fetchShifts = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/kru/shifts`);
+        if (response.ok) {
+          const data = await response.json();
+          // Filter shifts belonging to this specific crew member by comparing with crew's user id
+          const filtered = data.filter((s: any) => s.crew && s.crew.idUser === id);
+          
+          // Map backend ShiftLog entity to the shape expected by frontend state
+          const mappedShifts: ShiftLog[] = filtered.map((s: any) => ({
+            idShift: s.idShift,
+            idCrew: s.crew.idUser,
+            crewName: s.crew.nama,
+            tanggal: s.tanggal,
+            jamMulai: s.jamMulai,
+            jamSelesai: s.jamSelesai,
+            posTugas: s.posTugas,
+            statusHadir: s.statusHadir
+          }));
 
-      setMyShifts(filtered);
-    } else {
-      // Default mock shift fallback if manager hasn't scheduled anything yet
-      const fallbackShifts: ShiftLog[] = [
-        {
-          idShift: "SHF-MOCK-101",
-          idCrew: id,
-          crewName: name,
-          tanggal: new Date().toISOString().split("T")[0],
-          jamMulai: "08:00",
-          jamSelesai: "16:00",
-          posTugas: "Gate A Utama (Pintu Barat)",
-          statusHadir: "PENDING"
+          setMyShifts(mappedShifts);
         }
-      ];
-      setMyShifts(fallbackShifts);
-      // Save shifts back so it is stored
-      localStorage.setItem("tixevent_shifts", JSON.stringify(fallbackShifts));
-    }
+      } catch (err) {
+        console.error("Gagal menarik jadwal shift:", err);
+      }
+    };
+
+    fetchShifts();
   }, [crewName, crewId]);
 
   const handleClockIn = (idShift: string) => {
     setLoadingShiftId(idShift);
     setSuccess("");
 
-    // Simulate backend PUT to /api/kru/presensi
-    setTimeout(() => {
-      // 1. Read all shifts from localStorage
-      const savedShifts = localStorage.getItem("tixevent_shifts");
-      if (savedShifts) {
-        const parsedShifts = JSON.parse(savedShifts);
-        
-        // 2. Mark target shift as HADIR
-        const updatedGlobalShifts = parsedShifts.map((s: ShiftLog) => {
-          if (s.idShift === idShift) {
-            return {
-              ...s,
-              statusHadir: "HADIR"
-            };
-          }
-          return s;
+    const clockInAPI = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/kru/presensi`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            idShift: idShift,
+            idCrew: crewId,
+            statusHadir: "HADIR"
+          }),
         });
 
-        // 3. Save back to localStorage
-        localStorage.setItem("tixevent_shifts", JSON.stringify(updatedGlobalShifts));
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Gagal mencatat presensi.");
+        }
 
         // 4. Update local state
         setMyShifts(myShifts.map(s => s.idShift === idShift ? { ...s, statusHadir: "HADIR" } : s));
+        setSuccess(data.message || "Presensi berhasil dicatat! Selamat bertugas di gerbang event.");
+
+      } catch (err: any) {
+        console.error(err);
+      } finally {
+        setLoadingShiftId(null);
+        setTimeout(() => {
+          setSuccess("");
+        }, 3000);
       }
+    };
 
-      setSuccess("Presensi berhasil dicatat! Selamat bertugas di gerbang event.");
-      setLoadingShiftId(null);
-
-      setTimeout(() => {
-        setSuccess("");
-      }, 3000);
-    }, 600);
+    clockInAPI();
   };
 
   const handleLogout = () => {

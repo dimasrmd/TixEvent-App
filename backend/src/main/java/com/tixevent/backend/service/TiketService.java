@@ -47,10 +47,12 @@ public class TiketService {
 
         // 2. Tentukan Harga Tiket berdasarkan Kategori
         double hargaPerTiket = 0.0;
-        if (kategori.equalsIgnoreCase("VIP")) {
-            hargaPerTiket = 500000.0;
-        } else if (kategori.equalsIgnoreCase("Festival")) {
-            hargaPerTiket = 250000.0;
+        if (kategori.equalsIgnoreCase("VVIP")) {
+            hargaPerTiket = 2500000.0;
+        } else if (kategori.equalsIgnoreCase("VIP")) {
+            hargaPerTiket = 1200000.0;
+        } else if (kategori.equalsIgnoreCase("FESTIVAL")) {
+            hargaPerTiket = 450000.0;
         } else {
             hargaPerTiket = 150000.0;
         }

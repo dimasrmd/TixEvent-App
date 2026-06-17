@@ -17,43 +17,68 @@ export default function FinancialManagement() {
   const [auditLogs, setAuditLogs] = useState<FinancialAuditLog[]>([]);
 
   useEffect(() => {
-    // 1. Fetch dynamic approved refund total from localStorage
-    const savedRefundTotal = localStorage.getItem("tixevent_refund_total");
-    if (savedRefundTotal) {
-      setTotalRefund(parseFloat(savedRefundTotal));
-    }
-
-    // 2. Initialize or fetch audit logs
-    const defaultLogs: FinancialAuditLog[] = [
-      { idTransaksi: "TX-TIX-9081", item: "Pembelian Tiket VIP (2x)", nominal: 2400000, tipe: "INFLOW", keterangan: "Metode QRIS Bank Mandiri", waktu: "Baru saja" },
-      { idTransaksi: "TX-BTH-5021", item: "Sewa Lokasi Booth A01", nominal: 5000000, tipe: "INFLOW", keterangan: "Transfer Bank BCA - Gourmet Seafood", waktu: "10 menit yang lalu" },
-      { idTransaksi: "RFD-MOCK-303", item: "Refund Pembatalan Tiket VIP", nominal: 1200000, tipe: "OUTFLOW", keterangan: "Transfer Balik - Rian Hidayat", waktu: "1 jam yang lalu" },
-      { idTransaksi: "TX-TIX-9080", item: "Pembelian Tiket Festival (4x)", nominal: 1800000, tipe: "INFLOW", keterangan: "E-Wallet GoPay", waktu: "2 jam yang lalu" },
-      { idTransaksi: "TX-BTH-5022", item: "Sewa Lokasi Booth B03", nominal: 7500000, tipe: "INFLOW", keterangan: "Transfer Bank Mandiri - Rhythm Merch", waktu: "5 jam yang lalu" }
-    ];
-
-    // If there is any newly approved refund, let's append it to logs!
-    const savedRefunds = localStorage.getItem("tixevent_refunds");
-    let currentLogs = [...defaultLogs];
-    if (savedRefunds) {
-      const parsedRefunds = JSON.parse(savedRefunds);
-      const approvedClaims = parsedRefunds.filter((r: any) => r.statusRefund === "APPROVED" && r.idRefund !== "RFD-MOCK-303");
-      approvedClaims.forEach((claim: any) => {
-        // Avoid duplicates
-        if (!currentLogs.some((l) => l.idTransaksi === claim.idRefund)) {
-          currentLogs.unshift({
-            idTransaksi: claim.idRefund,
-            item: `Refund Pembatalan Tiket (${claim.idTransaksi})`,
-            nominal: claim.jumlahRefund,
-            tipe: "OUTFLOW",
-            keterangan: `Persetujuan Manajer - ${claim.namaPengunjung}`,
-            waktu: "Baru saja disetujui"
-          });
+    const fetchLaporan = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/keuangan/laporan`);
+        if (response.ok) {
+          const data = await response.json();
+          setTotalPemasukan(data.totalPemasukan || 0);
+          setTotalRefund(data.totalRefund || 0);
         }
-      });
-    }
+      } catch (err) {
+        console.error("Gagal menarik laporan keuangan:", err);
+      }
+    };
+    
+    const fetchMutasiKas = async () => {
+      try {
+        let allLogs: FinancialAuditLog[] = [];
 
-    setAuditLogs(currentLogs);
+        // Fetch Inflows (Transaksi LUNAS)
+        const resTrans = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/keuangan/transaksi`);
+        if (resTrans.ok) {
+          const dataTrans = await resTrans.json();
+          const lunasTrans = dataTrans.filter((t: any) => t.statusPembayaran && t.statusPembayaran.toUpperCase() === "LUNAS");
+          const inflowLogs: FinancialAuditLog[] = lunasTrans.map((t: any) => {
+            const isTenant = t.user?.role?.toLowerCase() === "tenant";
+            return {
+              idTransaksi: t.idTransaksi,
+              item: isTenant ? `Penyewaan Booth Mitra` : `Pembelian Tiket Acara`,
+              nominal: t.totalBayar,
+              tipe: "INFLOW",
+              keterangan: isTenant ? `Mitra: ${t.user?.nama || "Tenant"}` : `Pembeli: ${t.user?.nama || "Penonton"}`,
+              waktu: t.tanggalTransaksi || "N/A"
+            };
+          });
+          allLogs = [...allLogs, ...inflowLogs];
+        }
+
+        // Fetch Outflows (Refund APPROVED)
+        const resRefund = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/refund`);
+        if (resRefund.ok) {
+          const dataRefund = await resRefund.json();
+          const approvedRefunds = dataRefund.filter((r: any) => r.statusRefund === "APPROVED");
+          
+          const outflowLogs: FinancialAuditLog[] = approvedRefunds.map((r: any) => ({
+            idTransaksi: r.idRefund,
+            item: `Refund Pembatalan Tiket (${r.transaksi?.idTransaksi || "N/A"})`,
+            nominal: r.jumlahRefund,
+            tipe: "OUTFLOW",
+            keterangan: `Refund kepada: ${r.transaksi?.user?.nama || "Penonton"}`,
+            waktu: "Disetujui Manajer"
+          }));
+          
+          allLogs = [...allLogs, ...outflowLogs];
+        }
+
+        setAuditLogs(allLogs);
+      } catch (err) {
+        console.error("Gagal memuat riwayat mutasi kas", err);
+      }
+    };
+
+    fetchLaporan();
+    fetchMutasiKas();
   }, []);
 
   const formatCurrency = (val: number) => {
