@@ -68,7 +68,7 @@ public class KeuanganService {
         laporanRealTime.setLabaBersih(labaBersih);
 
         // (Opsional) Simpan ke database jika kamu ingin menjadikannya riwayat permanen
-        // financialReportRepository.save(laporanRealTime);
+        financialReportRepository.save(laporanRealTime);
 
         return laporanRealTime;
     }
